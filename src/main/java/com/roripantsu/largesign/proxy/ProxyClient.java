@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -18,6 +19,8 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameData;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  *Differentiate between the combined client and the dedicated server.
@@ -25,7 +28,7 @@ import cpw.mods.fml.common.registry.GameData;
  *@author ShenTeng Tu(RoriPantsu)
  */
 public class ProxyClient extends ProxyCommon {
-
+		
 	@Override
     public void init(FMLInitializationEvent e) {
 		super.init(e);
@@ -42,6 +45,7 @@ public class ProxyClient extends ProxyCommon {
     public void preInit(FMLPreInitializationEvent e) {
 		super.preInit(e);
 		this.ClientRegistry();
+		
     }
 	
 	private void ClientRegistry() {
@@ -51,6 +55,7 @@ public class ProxyClient extends ProxyCommon {
 				new TileEntityLargeSignRenderer());
 	}
 	
+	@SideOnly(Side.CLIENT)
 	private void getItemList(List<ItemStack> itemList) {
 		Map<String, Integer> map = Maps.newHashMap();
 		GameData.getItemRegistry().serializeInto(map);
@@ -73,7 +78,7 @@ public class ProxyClient extends ProxyCommon {
 			if(!ignoreIDList.contains(id)){
 				Item item = Item.getItemById(id);
 				List<ItemStack> subItemList = new ArrayList<ItemStack>();
-				item.getSubItems(item, item.getCreativeTab(), subItemList);
+				item.getSubItems(item, (CreativeTabs)null, subItemList);
 				for (ItemStack itemStack : subItemList){
 					if(id==373){
 						if(!ignoreMetaList.contains(itemStack.getItemDamageForDisplay()))

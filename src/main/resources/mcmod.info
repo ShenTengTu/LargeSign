@@ -4,7 +4,7 @@
 	"modid": "mod_LargeSign",
 	"name": "Large Sign",
 	"description": "<Large Sign> which has bigger block size and font size.You can edit text or insert item icon on it.",
-	"version": "1.0",
+	"version": "1.1",
 	"mcversion": "1.7.10",
 	"url": "",
 	"updateUrl": "",

@@ -19,6 +19,9 @@ import org.lwjgl.opengl.GL12;
 
 
 
+
+
+
 import com.google.common.collect.Maps;
 import com.roripantsu.largesign.Mod_LargeSign;
 
@@ -50,7 +53,13 @@ public class CustomGuiIconList extends GuiScreen {
 	private int page = 1;
 	private int xPosition;
 	private int yPosition;
-
+	
+	//Localize Gui-->
+	private String guiName=this.getClass().getSimpleName();
+	private String prev=LocalizeGui.guiLocalString(guiName, "prev", new Object[0]);
+	private String next=LocalizeGui.guiLocalString(guiName, "next", new Object[0]);
+	//<--Localize Gui
+	
 	public CustomGuiIconList(Minecraft MC, FontRenderer FontRenderer,
 			List<GuiButton> screenButtonList, int ID, int X, int Y) {
 
@@ -62,11 +71,11 @@ public class CustomGuiIconList extends GuiScreen {
 
 		screenButtonList.add(this.prevBtn = new GuiButton(ID, this.xPosition,
 				this.yPosition + ButtonSize[1] * 9 - 4, ButtonSize[0] * 2,
-				ButtonSize[1] + 2, "prev"));
+				ButtonSize[1] + 2, prev));
 		screenButtonList.add(this.nextBtn = new GuiButton(ID + 1,
 				this.xPosition + ButtonSize[0] * 6 + 6, this.yPosition
 						+ ButtonSize[1] * 9 - 4, ButtonSize[0] * 2,
-				ButtonSize[1] + 2, "next"));
+				ButtonSize[1] + 2, next));
 		this.itemListMap = this.splitListPutMap(this.itemList, columnNuber
 				* rowNuber);
 		for (int j = 1; j <= this.itemListMap.size(); j++) {

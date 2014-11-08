@@ -68,6 +68,15 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 	private boolean isVisible;
 	private int xPosition;
 	private int yPosition;
+	
+	//Localize Gui-->
+	private String guiName=this.getClass().getSimpleName();
+	private String title=LocalizeGui.guiLocalString(guiName, "title", new Object[0]);
+	private String editMsg=LocalizeGui.guiLocalString(guiName, "editMsg", new Object[0]);
+	private String shadow=LocalizeGui.guiLocalString(guiName, "shadow", new Object[0]);
+	private String reset=LocalizeGui.guiLocalString(guiName, "reset", new Object[0]);
+	private String resetAll=LocalizeGui.guiLocalString(guiName, "resetAll", new Object[0]);
+	//<--Localize Gui
 
 	public CustomGuiTextAndFontStyleEditor(Minecraft MC,
 			FontRenderer FontRenderer, List<GuiButton> screenButtonList,
@@ -85,7 +94,7 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 		this.editTextField.setMaxStringLength(64);
 		this.buttonList.add(this.shadowBtn = new GuiButton(ID, this.xPosition
 				- ButtonSize[0] / 2, this.yPosition, ButtonSize[0],
-				ButtonSize[1]+2, "Shadow " + OnOffStr[0]));
+				ButtonSize[1]+2, shadow+" "+ OnOffStr[0]));
 		this.buttonList.add(this.boldBtn = new GuiButton(ID + 1, this.xPosition
 				- ButtonSize[0] / 2, this.yPosition + (ButtonSize[1] + 2),
 				ButtonSize[0] / 2, ButtonSize[1]+2, "\u00a7l[B]\u00a7r "
@@ -106,11 +115,11 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 		this.buttonList.add(this.resetBtn = new GuiButton(ID + 5,
 				this.xPosition - ButtonSize[0] / 2, this.yPosition
 						+ (ButtonSize[1] + 2) * 3, ButtonSize[0],
-				ButtonSize[1]+ 2, "Reset " + FontStyles.RESET.styleDisplayCode));
+				ButtonSize[1]+ 2, reset+" "+ FontStyles.RESET.styleDisplayCode));
 		this.buttonList.add(this.resetAllBtn = new GuiButton(ID + 6,
 				this.xPosition - ButtonSize[0] / 2, this.yPosition
 						+ (ButtonSize[1] + 2) * 4, ButtonSize[0],
-				ButtonSize[1]+2, "ResetAll"));
+				ButtonSize[1]+2, resetAll));
 		screenButtonList.addAll(this.buttonList);
 		CustomGuiTextAndFontStyleEditor.FontStyles.SHADOW.enable = false;
 	}
@@ -119,9 +128,9 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 	public void drawScreen(int mouseX,int mouseY,float par3) {
 		if (this.isVisible) {
 			this.editTextField.drawTextBox();
-			this.drawCenteredString(this.fontRendererObj, "Font Styles:",
+			this.drawCenteredString(this.fontRendererObj, title,
 					this.xPosition, this.yPosition - 13, 16777215);
-			this.drawCenteredString(this.fontRendererObj, "Edit message:",
+			this.drawCenteredString(this.fontRendererObj, editMsg,
 					this.xPosition * 4, this.yPosition / 6 * 16, 16777215);
 		}
 	}

@@ -29,18 +29,12 @@ public class Mod_LargeSign {
 	public static ProxyCommon proxy;
 
 	/* CreativeTab */
-	public static CreativeTabs tab_modRoriPantsu = new CreativeTabs(
-			"tab_modRoriPantsu") {
-		@Override
-		public Item getTabIconItem() {
-			return GameRegistry.findItem(References.MODID,
-					Item_LargeSign.class.getSimpleName());
-		}
-	};
-
-	public Mod_LargeSign() {
-
+	public static final CreativeTabs tab_modRoriPantsu;
+	static{
+		tab_modRoriPantsu=safeAddCreativeTab("tab_modRoriPantsu");
 	}
+
+	public Mod_LargeSign() {}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
@@ -55,5 +49,22 @@ public class Mod_LargeSign {
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		proxy.preInit(event);
+	}
+	
+	private static CreativeTabs safeAddCreativeTab(String label){
+		CreativeTabs[] ctArr=CreativeTabs.creativeTabArray;
+		for(int i=ctArr.length-1;i>=0;i--){
+			if(ctArr[i].getTabLabel()==label){;
+				return ctArr[i];
+			}
+		}
+
+		return new CreativeTabs(label) {
+			@Override
+			public Item getTabIconItem() {
+				return GameRegistry.findItem(References.MODID,
+						Item_LargeSign.class.getSimpleName());
+			}
+		};
 	}
 }

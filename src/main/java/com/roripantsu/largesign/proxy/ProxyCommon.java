@@ -22,7 +22,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameRegistry;
-import cpw.mods.fml.common.registry.LanguageRegistry;
 
 /**
  *Differentiate between the combined client and the dedicated server.
@@ -55,8 +54,7 @@ public class ProxyCommon {
     	packetPipeline.postInitialise();
     }
 
-    @SuppressWarnings("deprecation")
-	public void preInit(FMLPreInitializationEvent e) {
+    public void preInit(FMLPreInitializationEvent e) {
 		/* Item */
 		item_LargeSign = new Item_LargeSign();
 		GameRegistry.registerItem(item_LargeSign,
@@ -71,13 +69,6 @@ public class ProxyCommon {
 		/* Recipe */
 		GameRegistry.addRecipe(new ItemStack(item_LargeSign, 3), new Object[] {
 				"SxS", "xIx", "SxS", 'S', Items.sign ,'I',Items.item_frame});
-
-		/* Language */
-		LanguageRegistry.instance().addStringLocalization(
-				"item." + Item_LargeSign.class.getSimpleName() + ".name",
-				"en_US", "Large Sign");
-		LanguageRegistry.instance().addStringLocalization(
-				"itemGroup.tab_modRoriPantsu", "en_US", "RoriPantsu's Mod");
     }
     
 }

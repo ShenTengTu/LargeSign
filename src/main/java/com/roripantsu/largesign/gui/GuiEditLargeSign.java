@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -39,6 +38,13 @@ public class GuiEditLargeSign extends GuiScreen {
 	private int modeNumber = 0;
 	private GuiButton textModeBtn;
 	private TileEntityLargeSign tileLargeSign;
+	
+	//Localize Gui-->
+	private String guiName=this.getClass().getSimpleName();
+	private String textMode=LocalizeGui.guiLocalString(guiName, "textMode", new Object[0]);
+	private String itemIconMode=LocalizeGui.guiLocalString(guiName, "itemIconMode", new Object[0]);
+	private String done=LocalizeGui.guiLocalString(guiName, "done", new Object[0]);
+	//<--Localize Gui
 
 	public GuiEditLargeSign(TileEntityLargeSign par1TileEntitySign) {
 		this.tileLargeSign = par1TileEntitySign;
@@ -81,13 +87,13 @@ public class GuiEditLargeSign extends GuiScreen {
 
 		this.buttonList.add(this.doneBtn = new GuiButton(0, this.width / 2
 				- ButtonSize[0] / 2, this.height / 32 * 30, ButtonSize[0],
-				ButtonSize[1], "Done"));
+				ButtonSize[1], done));
 		this.buttonList.add(this.setTextModeBtn(new GuiButton(1,
 				this.width / 32, this.height / 32, ButtonSize[0],
-				ButtonSize[1], "Text Mode")));
+				ButtonSize[1], textMode)));
 		this.buttonList.add(this.setItemModeBtn(new GuiButton(2, this.width
 				/ 32 + ButtonSize[0] + 2, this.height / 32, ButtonSize[0],
-				ButtonSize[1], "Item Icon Mode")));
+				ButtonSize[1], itemIconMode)));
 		this.fontStyleChooser = new CustomGuiTextAndFontStyleEditor(this.mc,
 				this.fontRendererObj, this.buttonList, 3, this.width * 1 / 8,
 				this.height / 32 * 8);
@@ -273,5 +279,5 @@ public class GuiEditLargeSign extends GuiScreen {
 		}
 
 	}
-
+	
 }

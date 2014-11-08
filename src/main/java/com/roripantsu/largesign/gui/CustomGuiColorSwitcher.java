@@ -50,6 +50,11 @@ public class CustomGuiColorSwitcher extends GuiScreen {
 	private int xPosition;
 	private int yPosition;
 	
+	//Localize Gui-->
+	private String guiName=this.getClass().getSimpleName();
+	private String title=LocalizeGui.guiLocalString(guiName, "title", new Object[0]);
+	//<--Localize Gui
+	
 	public CustomGuiColorSwitcher(Minecraft MC, FontRenderer FontRenderer,
 			List<GuiButton> screenButtonList, int ID, int X, int Y) {
 		
@@ -58,7 +63,7 @@ public class CustomGuiColorSwitcher extends GuiScreen {
 		this.lastButtonID=ID + 23;
 		this.xPosition=X;
 		this.yPosition=Y;
-		
+
 		this.ColorObj = new Color(this.RGBA[0], this.RGBA[1], this.RGBA[2],
 				this.RGBA[3]);
 		this.textFieldList.add(this.redTextField = new GuiTextField(
@@ -133,7 +138,8 @@ public class CustomGuiColorSwitcher extends GuiScreen {
 	@Override
 	public void drawScreen(int mouseX,int mouseY,float par3) {
 		if (this.isVisible) {
-			this.drawCenteredString(this.fontRendererObj, "Color Switcher:",
+			this.drawCenteredString(this.fontRendererObj, 
+					title,
 					this.xPosition + ButtonSize[0] * 2, this.yPosition - 15,
 					16777215);
 			this.redTextField.drawTextBox();

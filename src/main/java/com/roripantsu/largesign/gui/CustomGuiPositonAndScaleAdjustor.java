@@ -33,6 +33,15 @@ public class CustomGuiPositonAndScaleAdjustor extends GuiScreen {
 	private boolean isVisible;
 	private int xPosition;
 	private int yPosition;
+	
+	//Localize Gui-->
+	private String guiName=this.getClass().getSimpleName();
+	private String title=LocalizeGui.guiLocalString(guiName, "title", new Object[0]);
+	private String xPos=LocalizeGui.guiLocalString(guiName, "xPos", new Object[0]);
+	private String yPos=LocalizeGui.guiLocalString(guiName, "yPos", new Object[0]);
+	private String scale=LocalizeGui.guiLocalString(guiName, "scale", new Object[0]);
+	private String reset=LocalizeGui.guiLocalString(guiName, "reset", new Object[0]);
+	//<--Localize Gui
 
 	public CustomGuiPositonAndScaleAdjustor(Minecraft MC,
 			FontRenderer FontRenderer, List<GuiButton> screenButtonList,
@@ -64,23 +73,23 @@ public class CustomGuiPositonAndScaleAdjustor extends GuiScreen {
 				ButtonSize[0], ButtonSize[1]+2, "-1.0"));
 		this.buttonList.add(this.resetBtn = new GuiButton(ID + 6, X
 				+ (ButtonSize[0] + 1), Y + (ButtonSize[1] + 2) * 3,
-				ButtonSize[0] * 4 + 4, ButtonSize[1]+2, "reset"));
+				ButtonSize[0] * 4 + 4, ButtonSize[1]+2, reset));
 		screenButtonList.addAll(this.buttonList);
 	}
 
 	@Override
 	public void drawScreen(int mouseX,int mouseY,float par3) {
 		if (this.isVisible) {
-			this.drawCenteredString(this.fontRendererObj, "Adjustor:",
+			this.drawCenteredString(this.fontRendererObj, title,
 					this.xPosition + (ButtonSize[0] + 2) * 3,
 					this.yPosition - 14, 16777215);
-			this.drawCenteredString(this.fontRendererObj, "X pos.",
+			this.drawCenteredString(this.fontRendererObj, xPos,
 					this.xPosition + (ButtonSize[0] + 2) * 3,
 					this.yPosition + 6, 16777215);
-			this.drawCenteredString(this.fontRendererObj, "Y pos.",
+			this.drawCenteredString(this.fontRendererObj, yPos,
 					this.xPosition + (ButtonSize[0] + 2) * 3, this.yPosition
 							+ ButtonSize[1] + 6, 16777215);
-			this.drawCenteredString(this.fontRendererObj, "Scale", this.xPosition
+			this.drawCenteredString(this.fontRendererObj, scale, this.xPosition
 					+ (ButtonSize[0] + 1) * 3, this.yPosition
 					+ (ButtonSize[1] + 4) * 2, 16777215);
 		}
