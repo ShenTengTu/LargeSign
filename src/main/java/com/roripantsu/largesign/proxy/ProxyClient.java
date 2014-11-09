@@ -1,5 +1,7 @@
 package com.roripantsu.largesign.proxy;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,8 +21,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.GameData;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 /**
  *Differentiate between the combined client and the dedicated server.
@@ -55,7 +55,7 @@ public class ProxyClient extends ProxyCommon {
 				new TileEntityLargeSignRenderer());
 	}
 	
-	@SideOnly(Side.CLIENT)
+	
 	private void getItemList(List<ItemStack> itemList) {
 		Map<String, Integer> map = Maps.newHashMap();
 		GameData.getItemRegistry().serializeInto(map);
@@ -78,7 +78,30 @@ public class ProxyClient extends ProxyCommon {
 			if(!ignoreIDList.contains(id)){
 				Item item = Item.getItemById(id);
 				List<ItemStack> subItemList = new ArrayList<ItemStack>();
-				item.getSubItems(item, (CreativeTabs)null, subItemList);
+				Method[] methods=item.getClass().getDeclaredMethods();
+				int theIndex=-1;
+				for(int i=0;i<methods.length;i++){
+					if(methods[i].getName()=="func_150895_a"){
+						theIndex=i;
+						break;
+					}
+				}
+					
+				
+				if(theIndex>=0){
+					try {
+						methods[theIndex].invoke(item, item,(CreativeTabs)null,subItemList);
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}else{
+						item.getSubItems(item, (CreativeTabs)null, subItemList);
+				}
+
 				for (ItemStack itemStack : subItemList){
 					if(id==373){
 						if(!ignoreMetaList.contains(itemStack.getItemDamageForDisplay()))
