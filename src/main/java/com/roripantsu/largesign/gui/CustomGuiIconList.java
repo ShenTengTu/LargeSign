@@ -1,7 +1,10 @@
 package com.roripantsu.largesign.gui;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +14,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
@@ -22,9 +26,9 @@ import org.lwjgl.opengl.GL12;
 
 
 
-import com.google.common.collect.Maps;
-import com.roripantsu.largesign.Mod_LargeSign;
 
+import com.google.common.collect.Maps;
+import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -39,6 +43,14 @@ public class CustomGuiIconList extends GuiScreen {
 	private static final int[] ButtonSize = { 18, 18 };
 	private static final int columnNuber = 8;
 	private static final int rowNuber = 8;
+	private static List<ItemStack> itemList;
+	private static Map<Integer, List<ItemStack>> itemListMap;
+	
+	static{
+		getItemList(itemList = new ArrayList<ItemStack>());
+		itemListMap = splitListPutMap(itemList, columnNuber* rowNuber);
+	}
+	
 	protected final int lastButtonID;
 	protected GuiButton nextBtn;
 	protected GuiButton prevBtn;
@@ -48,8 +60,6 @@ public class CustomGuiIconList extends GuiScreen {
 			.newHashMap();
 	private int ID;
 	private boolean isVisible;
-	private List<ItemStack> itemList = Mod_LargeSign.proxy.itemList;
-	private Map<Integer, List<ItemStack>> itemListMap = Maps.newHashMap();
 	private int page = 1;
 	private int xPosition;
 	private int yPosition;
@@ -62,13 +72,15 @@ public class CustomGuiIconList extends GuiScreen {
 	
 	public CustomGuiIconList(Minecraft MC, FontRenderer FontRenderer,
 			List<GuiButton> screenButtonList, int ID, int X, int Y) {
-
+		
+		
 		this.fontRendererObj=FontRenderer;
 		this.ID=ID;
-		this.lastButtonID=ID + Mod_LargeSign.proxy.itemList.size()+1;
+		this.lastButtonID=ID + itemList.size()+1;
 		this.xPosition=X;
 		this.yPosition=Y;
-
+		
+		
 		screenButtonList.add(this.prevBtn = new GuiButton(ID, this.xPosition,
 				this.yPosition + ButtonSize[1] * 9 - 4, ButtonSize[0] * 2,
 				ButtonSize[1] + 2, prev));
@@ -76,11 +88,11 @@ public class CustomGuiIconList extends GuiScreen {
 				this.xPosition + ButtonSize[0] * 6 + 6, this.yPosition
 						+ ButtonSize[1] * 9 - 4, ButtonSize[0] * 2,
 				ButtonSize[1] + 2, next));
-		this.itemListMap = this.splitListPutMap(this.itemList, columnNuber
-				* rowNuber);
-		for (int j = 1; j <= this.itemListMap.size(); j++) {
-			if (this.itemListMap.containsKey(j)) {
-				List<ItemStack> list = this.itemListMap.get(j);
+		
+
+		for (int j = 1; j <= itemListMap.size(); j++) {
+			if (itemListMap.containsKey(j)) {
+				List<ItemStack> list = itemListMap.get(j);
 				List<CustomGuiButton> buttonList = new ArrayList<CustomGuiButton>();
 
 				for (int i = 0; i < list.size(); i++) {
@@ -280,7 +292,7 @@ public class CustomGuiIconList extends GuiScreen {
 		return null;
 	}
 	
-	private Map<Integer, List<ItemStack>> splitListPutMap(List<ItemStack> list,
+	private static Map<Integer, List<ItemStack>> splitListPutMap(List<ItemStack> list,
 			int subListSize) {
 		Map<Integer, List<ItemStack>> map = Maps.newHashMap();
 		int remainder = list.size() % subListSize;
@@ -296,6 +308,68 @@ public class CustomGuiIconList extends GuiScreen {
 							+ remainder));
 
 		return map;
+
+	}
+	
+	private static void getItemList(List<ItemStack> itemList) {
+		Map<String, Integer> map = Maps.newHashMap();
+		GameData.getItemRegistry().serializeInto(map);
+		List<Integer> IDList = new ArrayList<Integer>(map.values());
+		Collections.sort(IDList);
+		
+		//ignore item id
+		Integer[] ignoreID={7,8,9,10,11,51,52,60,62,78,90,99,100,119,122,127,137,141,142};
+		List<Integer> ignoreIDList=new ArrayList<Integer>(Arrays.asList(ignoreID));
+		
+		//ignore potion meta
+		Integer[] ignoreMeta={
+				8225 ,8226 ,8228 ,8229 ,8233 ,8236 ,8257 ,8258 ,
+				8259 ,8260 ,8262 ,8264 ,8265 ,8266 ,8269 ,8270 ,
+				16417 ,16418 ,16420 ,16421 ,16425 ,16428 ,16449 ,16450 ,
+				16451 ,16452 ,16454 ,16456 ,16457 ,16458 ,16461 ,16462 };
+		List<Integer> ignoreMetaList=new ArrayList<Integer>(Arrays.asList(ignoreMeta));
+		
+		for (int id : IDList) {
+			if(!ignoreIDList.contains(id)){
+				Item item = Item.getItemById(id);
+				List<ItemStack> subItemList = new ArrayList<ItemStack>();
+								
+				//fix for other mod items.>>
+				Method[] methods=item.getClass().getDeclaredMethods();
+				int theIndex=-1;
+				for(int i=0;i<methods.length;i++){
+					if(methods[i].getName()=="func_150895_a"){
+						theIndex=i;
+						break;
+					}
+				}
+					
+				if(theIndex>=0){
+					try {
+						methods[theIndex].invoke(item, item,(CreativeTabs)null,subItemList);
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (InvocationTargetException e) {
+						e.printStackTrace();
+					}
+				}else{
+						item.getSubItems(item, (CreativeTabs)null, subItemList);
+				}
+				//<<fix for other mod items.
+				
+				for (ItemStack itemStack : subItemList){
+					if(id==373){
+						if(!ignoreMetaList.contains(itemStack.getItemDamageForDisplay()))
+							itemList.add(itemStack);
+					}else{
+						
+						itemList.add(itemStack);
+					}
+				}
+			}
+		}
 
 	}
 
