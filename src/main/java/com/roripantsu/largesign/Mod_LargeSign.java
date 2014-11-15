@@ -3,7 +3,7 @@ package com.roripantsu.largesign;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 
-import com.roripantsu.largesign.items.Item_LargeSign;
+import com.roripantsu.largesign.blocks.Block_LargeSign;
 import com.roripantsu.largesign.proxy.ProxyCommon;
 
 import cpw.mods.fml.common.Mod;
@@ -63,7 +63,7 @@ public class Mod_LargeSign {
 			@Override
 			public Item getTabIconItem() {
 				return GameRegistry.findItem(References.MODID,
-						Item_LargeSign.class.getSimpleName());
+						Block_LargeSign.class.getSimpleName());
 			}
 		};
 	}

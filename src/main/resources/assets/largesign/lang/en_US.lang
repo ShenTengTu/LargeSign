@@ -1,7 +1,5 @@
 itemGroup.tab_modRoriPantsu=RoriPantsu's Mod
-block.Block_LargeSign.name=Large sign
-item.Item_LargeSign.name=Large sign
-tile.TileEntityLargeSign.name=Large sign
+tile.Block_LargeSign_oak.name=Large sign
 gui.CustomGuiColorSwitcher.title=Color Switcher:
 gui.CustomGuiIconList.prev=Prev
 gui.CustomGuiIconList.next=Next

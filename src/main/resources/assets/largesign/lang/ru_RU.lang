@@ -1,7 +1,5 @@
 ﻿itemGroup.tab_modRoriPantsu=RoriPantsu's Мод
-block.Block_LargeSign.name=Большая Таблица
-item.Item_LargeSign.name=Большая Таблица
-tile.TileEntityLargeSign.name=Большая Таблица
+tile.Block_LargeSign_oak.name=Большая Таблица
 gui.CustomGuiColorSwitcher.title=Палитра Цветов
 gui.CustomGuiIconList.prev=Предыдущая
 gui.CustomGuiIconList.next=Следующая

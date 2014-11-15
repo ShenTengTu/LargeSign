@@ -16,14 +16,16 @@ public class SPacketLargeSignEditorOpen extends AbsPacket {
 	private int xCoordinate;
 	private int yCoordinate;
 	private int zCoordinate;
+	private int theMetadata;////for Sub Block or Item
 
 	public SPacketLargeSignEditorOpen() {
 	}
 
-	public SPacketLargeSignEditorOpen(int xCoord, int yCoord, int zCoord) {
+	public SPacketLargeSignEditorOpen(int xCoord, int yCoord, int zCoord,int theMetadata) {
 		this.xCoordinate = xCoord;
 		this.yCoordinate = yCoord;
 		this.zCoordinate = zCoord;
+		this.theMetadata=theMetadata;//for Sub Block or Item
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -40,13 +42,19 @@ public class SPacketLargeSignEditorOpen extends AbsPacket {
 	public int getZCoordinate() {
 		return this.zCoordinate;
 	}
+	
+	//for Sub Block or Item
+	@SideOnly(Side.CLIENT)
+	public int getTheMetadata() {
+		return theMetadata;
+	}
 
 	@Override
 	protected void decodePacket(PacketBuffer buffer) throws IOException {
 		this.xCoordinate = buffer.readInt();
 		this.yCoordinate = buffer.readInt();
 		this.zCoordinate = buffer.readInt();
-
+		this.theMetadata=buffer.readInt();//for Sub Block or Item
 	}
 
 	@Override
@@ -54,6 +62,7 @@ public class SPacketLargeSignEditorOpen extends AbsPacket {
 		buffer.writeInt(this.xCoordinate);
 		buffer.writeInt(this.yCoordinate);
 		buffer.writeInt(this.zCoordinate);
+		buffer.writeInt(this.theMetadata);//for Sub Block or Item
 
 	}
 

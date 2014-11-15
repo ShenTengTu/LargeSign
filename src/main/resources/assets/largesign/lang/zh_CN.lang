@@ -1,7 +1,5 @@
 itemGroup.tab_modRoriPantsu=RoriPantsu的模组
-block.Block_LargeSign.name=大型告示牌
-item.Item_LargeSign.name=大型告示牌
-tile.TileEntityLargeSign.name=大型告示牌
+tile.Block_LargeSign_oak.name=大型告示牌
 gui.CustomGuiColorSwitcher.title=选择颜色:
 gui.CustomGuiIconList.prev=上一页
 gui.CustomGuiIconList.next=下一页

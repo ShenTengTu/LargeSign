@@ -2,9 +2,15 @@ package com.roripantsu.largesign.texture;
 
 
 public enum ETextureResource {
+
+	/*Enttity_large_sign(Domain.LargeSign,"large_sign",
+			new String[]{"oak","spruce","birch","jungle","acacia","dark_oak"}),
+	Item_large_sign(Domain.LargeSign,"item_large_sign",
+			new String[]{"oak","spruce","birch","jungle","acacia","dark_oak"});*/
 	
-	Enttity_large_sign(Domain.LargeSign,"large_sign"),
-	Item_large_sign(Domain.LargeSign,"item_large_sign");
+	Enttity_large_sign(Domain.LargeSign,"large_sign",new String[]{"oak"}),
+	Item_large_sign(Domain.LargeSign,"item_large_sign",new String[]{"oak"});
+
 	
 	public static class BasePath{
 		public static final String Blocks="textures/blocks";
@@ -26,13 +32,26 @@ public enum ETextureResource {
 		static final String LargeSign="largesign";
 	}
 	
-	public final String textureName;
-	private final String domain;
-	private final String fileName;
+	public final String[] textureName;
+	public final String domain;
+	public final String fileNamePrefix;
+	public final String[] fileNameSuffix;
 	
-	private ETextureResource(String domain,String fileName){
+	private ETextureResource(String domain,String fileNamePrefix,String... fileNameSuffix){
 		this.domain=domain;
-		this.fileName=fileName;
-		this.textureName=this.domain+":"+this.fileName;
+		this.fileNamePrefix=fileNamePrefix;
+		this.fileNameSuffix=fileNameSuffix;
+		if(fileNameSuffix==null){
+			this.textureName=new String[1];
+			this.textureName[0]=this.domain+":"+this.fileNamePrefix;
+		}else{
+			this.textureName=new String[fileNameSuffix.length];
+			for(int i=0;i<textureName.length;i++){
+				this.textureName[i]=this.domain+":"+this.fileNamePrefix+"_"+this.fileNameSuffix[i];
+			}
+		}
+			
+		
+			
 	}
 }

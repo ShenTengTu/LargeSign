@@ -7,6 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
 import org.apache.commons.lang3.text.StrBuilder;
@@ -27,8 +28,17 @@ import cpw.mods.fml.relauncher.SideOnly;
 public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 
 	public static TileEntityLargeSignRenderer instance = new TileEntityLargeSignRenderer();
-	private static final ResourceLocation textureLocation = 
-			new ResourceLocation(ETextureResource.Enttity_large_sign.textureName);
+	//for Sub Block or Item>>
+	private static final ResourceLocation[] textureLocation;
+			
+	static{
+		int n=ETextureResource.Enttity_large_sign.fileNameSuffix.length;
+		textureLocation=new ResourceLocation[n];
+		for(int i=0;i<n;i++){
+			textureLocation[i]=new ResourceLocation(ETextureResource.Enttity_large_sign.textureName[i]);
+		}
+	}
+	//<<for Sub Block or Item
 	private CustomFontRenderer fontrenderer;
 	private Minecraft MC = Minecraft.getMinecraft();
 	private final Model_LargeSign modelLargeSign = new Model_LargeSign();
@@ -72,7 +82,11 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 		GL11.glTranslatef((float) render_xCoord + 0.5F,
 				(float) render_yCoord + 0.5F, (float) render_zCoord + 0.5F);
 		GL11.glRotatef(-rotateAngle, 0.0F, 1.0F, 0.0F);
-		this.bindTexture(this.completeResourceLocation(textureLocation));
+		
+		//for Sub Block or Item
+		int i = MathHelper.clamp_int(tileEntityLargeSign.getTheMetadata(), 0, textureLocation.length-1);
+		this.bindTexture(this.completeResourceLocation(textureLocation[i]));
+		
 		GL11.glPushMatrix();
 		GL11.glScalef(1F, -0.875F, -0.5F);
 		this.modelLargeSign.renderLargeSign((Entity) null, 0.0F, 0.0F, 0.0F,

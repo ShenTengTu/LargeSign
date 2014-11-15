@@ -1,8 +1,8 @@
 package com.roripantsu.largesign.gui;
 
+import net.minecraft.client.resources.I18n;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.client.resources.I18n;
 
 @SideOnly(Side.CLIENT)
 public class LocalizeGui {

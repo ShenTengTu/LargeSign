@@ -3,13 +3,14 @@ package com.roripantsu.largesign.proxy;
 import java.util.List;
 
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import com.roripantsu.largesign.References;
 import com.roripantsu.largesign.blocks.Block_LargeSign;
-import com.roripantsu.largesign.items.Item_LargeSign;
+import com.roripantsu.largesign.items.ItemBlock_LargeSign;
 import com.roripantsu.largesign.network.CPacketUpdateLargeSign;
 import com.roripantsu.largesign.network.CustomPacketEventListener;
 import com.roripantsu.largesign.network.PacketPipeline;
@@ -32,7 +33,6 @@ public class ProxyCommon {
 	
 	public Block block_LargeSign;
 	public final int channelKey=0;
-	public Item item_LargeSign;
 	public List<ItemStack> itemList;
 	public PacketPipeline packetPipeline;
 	public CustomTextureSprite textureBlockLargeSign;
@@ -55,20 +55,18 @@ public class ProxyCommon {
     }
 
     public void preInit(FMLPreInitializationEvent e) {
-		/* Item */
-		item_LargeSign = new Item_LargeSign();
-		GameRegistry.registerItem(item_LargeSign,
-				Item_LargeSign.class.getSimpleName(), References.MODID);
-
 		/* Block */
 		block_LargeSign = new Block_LargeSign(TileEntityLargeSign.class);
-		GameRegistry.registerBlock(block_LargeSign,null,
+		GameRegistry.registerBlock(block_LargeSign,ItemBlock_LargeSign.class,
 				Block_LargeSign.class.getSimpleName());
-		//par2:set null let Block not be an ItemBlock
 
 		/* Recipe */
-		GameRegistry.addRecipe(new ItemStack(item_LargeSign, 3), new Object[] {
-				"SxS", "xIx", "SxS", 'S', Items.sign ,'I',Items.item_frame});
+		Item[] items=new Item[]{new ItemStack(Blocks.planks,1,0).getItem()};
+		for(int i=0;i<items.length;i++){
+			GameRegistry.addRecipe(new ItemStack(block_LargeSign, 3,i), new Object[] {
+				"SSS", "SIS", "SSS", 'S', items[i] ,'I',Items.item_frame});
+			
+		}
     }
     
 }

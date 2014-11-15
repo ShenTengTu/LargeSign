@@ -28,6 +28,7 @@ public class TileEntityLargeSign extends TileEntity {
 	private boolean Editable = true;
 	private EntityPlayer entityPlayer;
 	private NBTTagCompound NBTTC = new NBTTagCompound();
+	private int theMetadata=0;//for Sub Block or Item
 
 	@Override
 	public Packet getDescriptionPacket() {
@@ -69,6 +70,7 @@ public class TileEntityLargeSign extends TileEntity {
 	public void readFromNBT(NBTTagCompound NBTTC) {
 		this.Editable = false;
 		super.readFromNBT(NBTTC);
+		this.theMetadata=NBTTC.getInteger("theMetadata");//for Sub Block or Item
 		this.modeNumber = NBTTC.getInteger("modeNumber");
 		this.itemID = NBTTC.getInteger("itemID");
 		this.itemMetadata = NBTTC.getInteger("itemMetadata");
@@ -106,6 +108,7 @@ public class TileEntityLargeSign extends TileEntity {
 		NBTTC.setInteger("x", this.xCoord);
 		NBTTC.setInteger("y", this.yCoord);
 		NBTTC.setInteger("z", this.zCoord);
+		NBTTC.setInteger("theMetadata", this.theMetadata);//for Sub Block or Item
 		NBTTC.setInteger("modeNumber", this.modeNumber);
 		NBTTC.setInteger("largeSignTextColor", this.largeSignTextColor);
 		NBTTC.setInteger("itemID", this.itemID);
@@ -116,6 +119,16 @@ public class TileEntityLargeSign extends TileEntity {
 		NBTTC.setFloat("scaleAdjust", this.scaleAdjust);
 		NBTTC.setString("largeSignText", this.largeSignText[0]);
 		this.NBTTC = NBTTC;
+	}
+	
+	//for Sub Block or Item
+	public int getTheMetadata() {
+		return this.theMetadata;
+	}
+	
+	//for Sub Block or Item
+	public void setTheMetadata(int Metadata) {
+		this.theMetadata = Metadata;
 	}
 
 }

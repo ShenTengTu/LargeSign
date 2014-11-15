@@ -55,6 +55,8 @@ public class NetHandlerPlayClientSide extends NetHandlerPlayClient {
 			((TileEntity) object).xCoord = thePacket.getXCoordinate();
 			((TileEntity) object).yCoord = thePacket.getYCoordinate();
 			((TileEntity) object).zCoord = thePacket.getZCoordinate();
+			//for Sub Block or Item
+			((TileEntityLargeSign) object).setTheMetadata(thePacket.getTheMetadata());
 		}
 
 		this.gameController.displayGuiScreen(new GuiEditLargeSign(

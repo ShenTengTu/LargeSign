@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
@@ -46,8 +47,8 @@ public class GuiEditLargeSign extends GuiScreen {
 	private String done=LocalizeGui.guiLocalString(guiName, "done", new Object[0]);
 	//<--Localize Gui
 
-	public GuiEditLargeSign(TileEntityLargeSign par1TileEntitySign) {
-		this.tileLargeSign = par1TileEntitySign;
+	public GuiEditLargeSign(TileEntityLargeSign tileEntity) {
+		this.tileLargeSign = tileEntity;
 	}
 
 	@Override
