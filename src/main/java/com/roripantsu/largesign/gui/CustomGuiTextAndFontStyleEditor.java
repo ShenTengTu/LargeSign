@@ -24,26 +24,26 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 
 	public static enum FontStyles {
 
-		BOLD("\u00a7l", '\u24b7'), ITALIC("\u00a7o", '\u24be'), RESET(
-				"\u00a7r", '\u24c7'), RESETALL, SHADOW(false), STRIKETHROUGH(
-				"\u00a7m", '\u24c8'), UNDERLINE("\u00a7n", '\u24ca');
+		BOLD("\u00a7l", "<b:>"), ITALIC("\u00a7o", "<i:>"), RESET(
+		"\u00a7r", "</r>"), RESETALL, SHADOW(false), STRIKETHROUGH(
+		"\u00a7m", "<s:>"), UNDERLINE("\u00a7n", "<u:>");
 
 		public boolean enable = false;
 		public final String styleCode;
-		public final char styleDisplayCode;
+		public final String styleDisplayCode;
 
 		private FontStyles() {
 			this.styleCode = "";
-			this.styleDisplayCode = '\u0000';
+			this.styleDisplayCode = "";
 		}
 
 		private FontStyles(boolean enable) {
 			this.styleCode = "";
-			this.styleDisplayCode = '\u0000';
+			this.styleDisplayCode = "";
 			this.enable = enable;
 		}
 
-		private FontStyles(String code, char displayCode) {
+		private FontStyles(String code, String displayCode) {
 			this.styleCode = code;
 			this.styleDisplayCode = displayCode;
 		}
@@ -90,8 +90,8 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 		
 		this.currentFontStyle = FontStyles.RESET;
 		this.editTextField = new GuiTextField(this.fontRendererObj,
-				this.xPosition * 4 - 180 / 2, this.yPosition / 6 * 18, 180, 15);
-		this.editTextField.setMaxStringLength(64);
+				this.xPosition * 4 - 360 / 2, this.yPosition / 6 * 18, 360, 15);
+		this.editTextField.setMaxStringLength(256);
 		this.buttonList.add(this.shadowBtn = new GuiButton(ID, this.xPosition
 				- ButtonSize[0] / 2, this.yPosition, ButtonSize[0],
 				ButtonSize[1]+2, shadow+" "+ OnOffStr[0]));
@@ -173,32 +173,32 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 			}
 			if (btn.id == this.ID + 1) {
 				this.currentFontStyle = FontStyles.BOLD;
-				this.editTextField.setText(this
-						.formatStringInsert(this.editTextField.getText()));
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
 			}
 
 			if (btn.id == this.ID + 2) {
 				this.currentFontStyle = FontStyles.STRIKETHROUGH;
-				this.editTextField.setText(this
-						.formatStringInsert(this.editTextField.getText()));
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
 			}
 
 			if (btn.id == this.ID + 3) {
 				this.currentFontStyle = FontStyles.UNDERLINE;
-				this.editTextField.setText(this
-						.formatStringInsert(this.editTextField.getText()));
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
 			}
 
 			if (btn.id == this.ID + 4) {
 				this.currentFontStyle = FontStyles.ITALIC;
-				this.editTextField.setText(this
-						.formatStringInsert(this.editTextField.getText()));
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
 			}
 
 			if (btn.id == this.ID + 5) {
 				this.currentFontStyle = FontStyles.RESET;
-				this.editTextField.setText(this
-						.formatStringInsert(this.editTextField.getText()));
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
 			}
 
 			if (btn.id == this.ID + 6) {
@@ -215,7 +215,7 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 	}
 
 	protected String formatStringChange(String str) {
-		char[] displycodes = {
+		String[] displycodes = {
 				CustomGuiTextAndFontStyleEditor.FontStyles.BOLD.styleDisplayCode,
 				CustomGuiTextAndFontStyleEditor.FontStyles.ITALIC.styleDisplayCode,
 				CustomGuiTextAndFontStyleEditor.FontStyles.RESET.styleDisplayCode,
@@ -231,7 +231,7 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 
 		StrBuilder strb = new StrBuilder(str);
 		for (int i = 0; i < displycodes.length; i++)
-			strb.replaceAll(String.valueOf(displycodes[i]), formatcodes[i]);
+			strb.replaceAll(displycodes[i], formatcodes[i]);
 
 		return strb.toString();
 	}
@@ -240,8 +240,6 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 	protected void keyTyped(char par1, int par2) {
 
 		this.editTextField.textboxKeyTyped(par1, par2);
-		this.editTextField.setText(this
-				.StringNumberLimitProcess(this.editTextField.getText()));
 	}
 
 	@Override
@@ -251,13 +249,9 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 		}
 	}
 
-	private int CharNumberCount(String str) {
-		return this.formatStringClear(str).length();
-	}
-
 	private String formatStringClear(String str) {
 
-		char[] displycodes = {
+		String[] displycodes = {
 				CustomGuiTextAndFontStyleEditor.FontStyles.BOLD.styleDisplayCode,
 				CustomGuiTextAndFontStyleEditor.FontStyles.ITALIC.styleDisplayCode,
 				CustomGuiTextAndFontStyleEditor.FontStyles.RESET.styleDisplayCode,
@@ -266,44 +260,10 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 
 		StrBuilder strb = new StrBuilder(str);
 		if (this.editTextField.getText() != null)
-			for (char c : displycodes)
+			for (String c : displycodes)
 				strb.deleteAll(c);
 
 		return strb.toString();
 	}
-
-	private String formatStringInsert(String str) {
-		StrBuilder strb = new StrBuilder(str);
-
-		if (this.editTextField.getText() != null) {
-			int currentCursorPosition=this.editTextField.getCursorPosition();
-			strb.insert(currentCursorPosition,
-					this.currentFontStyle.styleDisplayCode);
-			this.editTextField.setFocused(true);
-			
-		}
-
-		return strb.toString();
-
-	}
-
-	private String StringNumberLimitProcess(String str) {
-		char[] displycodes = {
-				CustomGuiTextAndFontStyleEditor.FontStyles.BOLD.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.ITALIC.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.RESET.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.STRIKETHROUGH.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.UNDERLINE.styleDisplayCode };
-		StrBuilder strb = new StrBuilder(str);
-		int index = strb.length() - 1;
-		while (CharNumberCount(strb.toString()) > 8) {
-			char a = strb.charAt(index);
-			if (a != displycodes[0] && a != displycodes[1]
-					&& a != displycodes[2] && a != displycodes[3])
-				strb.deleteCharAt(index);
-			index--;
-		}
-
-		return strb.toString();
-	}
+	
 }

@@ -152,22 +152,29 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 				this.MC.renderEngine, true);
 		this.fontrenderer.setUnicodeFlag(true);
 		this.fontrenderer.setBidiFlag(true);
+		String displayString=this.fontrenderer.trimStringToWidth(str, 80);
+		int stringWidth = this.fontrenderer.getStringWidth(displayString);
+		
+		float scaleParam = stringWidth <= 72 ? 
+				(stringWidth <= 63 ? 
+						(stringWidth <= 54 ? 
+								(stringWidth <= 45 ? 
+										(stringWidth <= 36 ? 
+												(stringWidth <= 27 ? 
+														(stringWidth <= 18 ? 
+																(stringWidth <= 9 ? 90F: 50F)
+														: 35F)
+												: 26F)
+										: 21F)
+								: 17F)
+						: 15F)
+				: 12.5F): 12.5F;
 
-		int stringWidth = this.fontrenderer.getStringWidth(str);
-		float scaleParam = stringWidth <= 72 ? (stringWidth <= 63 ? (stringWidth <= 54 ? (stringWidth <= 45 ? (stringWidth <= 36 ? (stringWidth <= 27 ? (stringWidth <= 18 ? (stringWidth <= 9 ? 90F
-				: 50F)
-				: 35F)
-				: 26F)
-				: 21F)
-				: 17F)
-				: 15F)
-				: 13F)
-				: 11F;
 		if (str.getBytes().length == 1)
 			scaleParam = 110F;
 		if (this.formatStringClear(str).getBytes().length == 1)
 			scaleParam = 100F;
-
+		
 		GL11.glTranslatef(0.0F, 0F, -0.435F);
 		GL11.glScalef((scaleParam + adjust[0]) / 1000F,
 				-(scaleParam + adjust[0]) / 1000F,
@@ -175,10 +182,12 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 		GL11.glNormal3f(0.0F, 0.0F, -1.75F * (scaleParam + adjust[0]) / 1000F);// luminance
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_BLEND);
+		
 
-		this.fontrenderer.drawString(str,
-				-this.fontrenderer.getStringWidth(str) / 2.0F + adjust[1],
-				-4.5F + adjust[2], color, hasShadow);
+		this.fontrenderer.drawString(displayString,
+			-stringWidth / 2.0F + adjust[1],
+			-4.5F + adjust[2], color, hasShadow);
+
 
 		GL11.glDepthMask(true);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
