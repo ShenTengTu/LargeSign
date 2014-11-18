@@ -31,7 +31,13 @@ public class Mod_LargeSign {
 	/* CreativeTab */
 	public static final CreativeTabs tab_modRoriPantsu;
 	static{
-		tab_modRoriPantsu=safeAddCreativeTab("tab_modRoriPantsu");
+		tab_modRoriPantsu=new CreativeTabs("tab_modRoriPantsu") {
+			@Override
+			public Item getTabIconItem() {
+				return GameRegistry.findItem(References.MODID,
+						Block_LargeSign.class.getSimpleName());
+			}
+		};
 	}
 
 	public Mod_LargeSign() {}
@@ -51,20 +57,4 @@ public class Mod_LargeSign {
 		proxy.preInit(event);
 	}
 	
-	private static CreativeTabs safeAddCreativeTab(String label){
-		CreativeTabs[] ctArr=CreativeTabs.creativeTabArray;
-		for(int i=ctArr.length-1;i>=0;i--){
-			if(ctArr[i].getTabLabel()==label){;
-				return ctArr[i];
-			}
-		}
-
-		return new CreativeTabs(label) {
-			@Override
-			public Item getTabIconItem() {
-				return GameRegistry.findItem(References.MODID,
-						Block_LargeSign.class.getSimpleName());
-			}
-		};
-	}
 }
