@@ -237,7 +237,8 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 	}
 	
 	//for Sub Block or Item
-    @SideOnly(Side.CLIENT)
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@SideOnly(Side.CLIENT)
     @Override
     public void getSubBlocks(Item item, CreativeTabs tabs, List list)
     {

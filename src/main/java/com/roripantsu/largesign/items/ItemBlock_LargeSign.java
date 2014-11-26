@@ -78,6 +78,7 @@ public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
 	}
 	
 	//for Sub Block or Item
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item item, CreativeTabs tab, List list) {

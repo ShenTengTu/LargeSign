@@ -16,7 +16,6 @@ import com.roripantsu.largesign.network.CustomPacketEventListener;
 import com.roripantsu.largesign.network.PacketPipeline;
 import com.roripantsu.largesign.network.SPacketLargeSignEditorOpen;
 import com.roripantsu.largesign.network.SPacketUpdateLargeSign;
-import com.roripantsu.largesign.texture.CustomTextureSprite;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -35,7 +34,6 @@ public class ProxyCommon {
 	public final int channelKey=0;
 	public List<ItemStack> itemList;
 	public PacketPipeline packetPipeline;
-	public CustomTextureSprite textureBlockLargeSign;
 	
 	public void init(FMLInitializationEvent e) {
 		

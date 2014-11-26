@@ -5,12 +5,12 @@ Source code of Minecraft Mod "Large Sign"
 
 #Version
 ##release
-- Mod ver. 1.1
+- Mod ver. 1.2
 - Minecraft ver. 1.7.1.0
 - Forge ver. 10.13.2.1230
 
 ##develop
-- Mod ver. 1.2
+- Mod ver. 2.0
 - Minecraft ver. 1.7.1.0
 - Forge ver. 10.13.2.1230
 

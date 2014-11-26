@@ -1,12 +1,14 @@
 package com.roripantsu.largesign.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
+
+import com.roripantsu.guilib.CustomGuiSlider;
+import com.roripantsu.guilib.GuiI18n;
+import com.roripantsu.guilib.GuiMainScreen;
+import com.roripantsu.guilib.GuiSubScreen;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -16,128 +18,80 @@ import cpw.mods.fml.relauncher.SideOnly;
  *@author ShenTeng Tu(RoriPantsu)
  */
 @SideOnly(Side.CLIENT)
-public class CustomGuiPositonAndScaleAdjustor extends GuiScreen {
-
-	private static final int[] ButtonSize = { 18, 18 };
-	protected float[] adjust = { 0, 0, 0 };
-	protected final int lastButtonID;
-	protected GuiButton resetBtn;
-	protected GuiButton sacleNBtn;
-	protected GuiButton saclePBtn;
-	protected GuiButton XnBtn;
-	protected GuiButton XpBtn;
-	protected GuiButton YnBtn;
-	protected GuiButton YpBtn;
-	private List<GuiButton> buttonList = new ArrayList<GuiButton>();
-	private int ID;
-	private boolean isVisible;
-	private int xPosition;
-	private int yPosition;
+public class CustomGuiPositonAndScaleAdjustor extends GuiSubScreen {
+	
+	private CustomGuiSlider xPosSlider;
+	private CustomGuiSlider yPosSlider;
+	private CustomGuiSlider scaleSlider;
+	private GuiButton resetBtn;
+	float[] adjust= { 0, 0, 0 };
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
-	private String title=LocalizeGui.guiLocalString(guiName, "title", new Object[0]);
-	private String xPos=LocalizeGui.guiLocalString(guiName, "xPos", new Object[0]);
-	private String yPos=LocalizeGui.guiLocalString(guiName, "yPos", new Object[0]);
-	private String scale=LocalizeGui.guiLocalString(guiName, "scale", new Object[0]);
-	private String reset=LocalizeGui.guiLocalString(guiName, "reset", new Object[0]);
+	private String title=GuiI18n.localize(guiName, "title", new Object[0]);
+	private String xPos=GuiI18n.localize(guiName, "xPos", new Object[0]);
+	private String yPos=GuiI18n.localize(guiName, "yPos", new Object[0]);
+	private String scale=GuiI18n.localize(guiName, "scale", new Object[0]);
+	private String reset=GuiI18n.localize(guiName, "reset", new Object[0]);
 	//<--Localize Gui
-
-	public CustomGuiPositonAndScaleAdjustor(Minecraft MC,
-			FontRenderer FontRenderer, List<GuiButton> screenButtonList,
-			int ID, int X, int Y) {
-		
-		this.fontRendererObj=FontRenderer;
-		this.ID=ID;
-		this.lastButtonID=ID + 6;
-		this.xPosition=X;
-		this.yPosition=Y;
-		
-		this.buttonList.add(this.XpBtn = new GuiButton(ID, X
-				+ (ButtonSize[0] + 1) * 4+1, Y, ButtonSize[0], ButtonSize[1]+2,
-				"\u2192"));
-		this.buttonList.add(this.XnBtn = new GuiButton(ID + 1, X
-				+ (ButtonSize[0] + 1), Y, ButtonSize[0], ButtonSize[1]+2,
-				"\u2190"));
-		this.buttonList.add(this.YpBtn = new GuiButton(ID + 2, X
-				+ (ButtonSize[0] + 1) * 4+1, Y + ButtonSize[1] + 2,
-				ButtonSize[0], ButtonSize[1]+2, "\u2193"));
-		this.buttonList.add(this.YnBtn = new GuiButton(ID + 3, X
-				+ (ButtonSize[0] + 1), Y + ButtonSize[1] + 2, ButtonSize[0],
-				ButtonSize[1]+2, "\u2191"));
-		this.buttonList.add(this.saclePBtn = new GuiButton(ID + 4, X
-				+ (ButtonSize[0] + 1) * 4+1, Y + (ButtonSize[1] + 2) * 2,
-				ButtonSize[0], ButtonSize[1]+2, "+1.0"));
-		this.buttonList.add(this.sacleNBtn = new GuiButton(ID + 5, X
-				+ (ButtonSize[0] + 1), Y + (ButtonSize[1] + 2) * 2,
-				ButtonSize[0], ButtonSize[1]+2, "-1.0"));
-		this.buttonList.add(this.resetBtn = new GuiButton(ID + 6, X
-				+ (ButtonSize[0] + 1), Y + (ButtonSize[1] + 2) * 3,
-				ButtonSize[0] * 4 + 4, ButtonSize[1]+2, reset));
-		screenButtonList.addAll(this.buttonList);
+	
+	public CustomGuiPositonAndScaleAdjustor(int ID,Minecraft MC,FontRenderer font,GuiMainScreen parent,
+			int x, int y,int width,int height) {
+		super(ID, MC, font, parent, x, y, width, height);
+	}
+	
+	
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float par3) {
+		if (this.isVisible) {
+			this.drawCenteredString(this.fontRendererObj, title,this.GroupX+this.width/2,this.GroupY, 16777215);
+		}
+	}
+	 
+	protected void mouseClickMove(int mouseX, int mouseY, int lastButtonClicked, long  timeSinceMouseClick) {
+		if(this.xPosSlider.isPressed)
+			this.adjust[1]=this.xPosSlider.getValue();
+		if(this.yPosSlider.isPressed)
+			this.adjust[2]=this.yPosSlider.getValue();
+		if(this.scaleSlider.isPressed)
+			this.adjust[0]=this.scaleSlider.getValue();
+	}
+	
+	/**
+	 *Define action performed of the button.
+	 */
+	@Override
+	protected void actionPerformed(GuiButton button) {
+		if (button.id == this.resetBtn.id) {
+			this.xPosSlider.setValue(this.adjust[0] = 0F);
+			this.yPosSlider.setValue(this.adjust[1] = 0F);
+			this.scaleSlider.setValue(this.adjust[2] = 0F);	
+		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void drawScreen(int mouseX,int mouseY,float par3) {
-		if (this.isVisible) {
-			this.drawCenteredString(this.fontRendererObj, title,
-					this.xPosition + (ButtonSize[0] + 2) * 3,
-					this.yPosition - 14, 16777215);
-			this.drawCenteredString(this.fontRendererObj, xPos,
-					this.xPosition + (ButtonSize[0] + 2) * 3,
-					this.yPosition + 6, 16777215);
-			this.drawCenteredString(this.fontRendererObj, yPos,
-					this.xPosition + (ButtonSize[0] + 2) * 3, this.yPosition
-							+ ButtonSize[1] + 6, 16777215);
-			this.drawCenteredString(this.fontRendererObj, scale, this.xPosition
-					+ (ButtonSize[0] + 1) * 3, this.yPosition
-					+ (ButtonSize[1] + 4) * 2, 16777215);
-		}
+	public void initGui() {	
+		this.buttonList.clear();
+		this.buttonList.add(this.xPosSlider = 
+				new CustomGuiSlider(id, GroupX, GroupY+fixH(this.gridHeight*4), fixW(this.gridWidth*20), xPos, 1.0F, -32F, 32F, 0));
+		this.buttonList.add(this.yPosSlider = 
+				new CustomGuiSlider(id+1, GroupX, GroupY+fixH(this.gridHeight*4+20), fixW(this.gridWidth*20), yPos, 1.0F, -32F, 32F, 0));
+		this.buttonList.add(this.scaleSlider = 
+				new CustomGuiSlider(id+2, GroupX, GroupY+fixH(this.gridHeight*4+40), fixW(this.gridWidth*20), scale, 2.0F, -64F, 64F, 0));
+		this.buttonList.add(this.resetBtn = 
+				new GuiButton(id+3, GroupX, GroupY+fixH(this.gridHeight*4+60), fixW(this.gridWidth*20), 20, reset));
+		this.parentButtonList.addAll(this.buttonList);
+
 	}
 
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
 		this.adjust = new float[] { 0, 0, 0 };
 		for (int i = 0; i < this.buttonList.size(); i++) {
-			this.buttonList.get(i).visible = isVisible;
-			this.buttonList.get(i).enabled = isVisible;
+			((GuiButton)this.buttonList.get(i)).visible = isVisible;
+			((GuiButton)this.buttonList.get(i)).enabled = isVisible;
 		}
 	}
-
-	/*@Override
-	public void updateScreen() {
-	}*/
-
-	@Override
-	protected void actionPerformed(GuiButton btn) {
-
-		if (btn.id == this.ID)
-			this.adjust[1] += 0.2F;
-		if (btn.id == this.ID + 1)
-			this.adjust[1] -= 0.2F;
-		if (btn.id == this.ID + 2)
-			this.adjust[2] += 0.2F;
-		if (btn.id == this.ID + 3)
-			this.adjust[2] -= 0.2F;
-		if (btn.id == this.ID + 4)
-			this.adjust[0] += 1F;
-		if (btn.id == this.ID + 5)
-			this.adjust[0] -= 1F;
-		if (btn.id == this.ID + 6) {
-			this.adjust[0] = 0F;
-			this.adjust[1] = 0F;
-			this.adjust[2] = 0F;
-		}
-
-	}
-
-	/*@Override
-	protected void keyTyped(char par1, int par2) {
-	}*/
-
-	/*@Override
-	protected void mouseClicked(int mouseX, int mouseY, int par3) {
-
-	}*/
-
 }
+

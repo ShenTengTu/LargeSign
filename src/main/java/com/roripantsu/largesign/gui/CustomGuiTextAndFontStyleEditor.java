@@ -1,15 +1,15 @@
 package com.roripantsu.largesign.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiTextField;
 
 import org.apache.commons.lang3.text.StrBuilder;
+
+import com.roripantsu.guilib.GuiI18n;
+import com.roripantsu.guilib.GuiMainScreen;
+import com.roripantsu.guilib.GuiSubScreen;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -20,8 +20,8 @@ import cpw.mods.fml.relauncher.SideOnly;
  *@author ShenTeng Tu(RoriPantsu)
  */
 @SideOnly(Side.CLIENT)
-public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
-
+public class CustomGuiTextAndFontStyleEditor extends GuiSubScreen {
+	
 	public static enum FontStyles {
 
 		BOLD("\u00a7l", "<b:>"), ITALIC("\u00a7o", "<i:>"), RESET(
@@ -48,91 +48,148 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 			this.styleDisplayCode = displayCode;
 		}
 	}
-
-	private static final int[] ButtonSize = { 60, 18 };
+	private FontStyles currentFontStyle;
+	private GuiButton shadowBtn;
+	private GuiButton boldBtn;
+	private GuiButton strikethroughBtn;
+	private GuiButton underlineBtn;
+	private GuiButton italicBtn;
+	private GuiButton resetBtn;
+	private GuiButton resetAllBtn;
 	private static final String[] OnOffStr = { "[off]", "[on]" };
-	protected GuiButton boldBtn;
-	protected FontStyles currentFontStyle;
-	protected GuiTextField editTextField;
-	protected GuiButton italicBtn;
-	protected final int lastButtonID;
-	protected GuiButton resetAllBtn;
-	protected GuiButton resetBtn;
-	protected GuiButton selectedButton;
-	protected GuiButton shadowBtn;
-	protected GuiButton strikethroughBtn;
-	protected GuiButton underlineBtn;
-
-	private List<GuiButton> buttonList = new ArrayList<GuiButton>();
-	private int ID;
-	private boolean isVisible;
-	private int xPosition;
-	private int yPosition;
+	GuiTextField editTextField;
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
-	private String title=LocalizeGui.guiLocalString(guiName, "title", new Object[0]);
-	private String editMsg=LocalizeGui.guiLocalString(guiName, "editMsg", new Object[0]);
-	private String shadow=LocalizeGui.guiLocalString(guiName, "shadow", new Object[0]);
-	private String reset=LocalizeGui.guiLocalString(guiName, "reset", new Object[0]);
-	private String resetAll=LocalizeGui.guiLocalString(guiName, "resetAll", new Object[0]);
+	private String title=GuiI18n.localize(guiName, "title", new Object[0]);
+	private String editMsg=GuiI18n.localize(guiName, "editMsg", new Object[0]);
+	private String shadow=GuiI18n.localize(guiName, "shadow", new Object[0]);
+	private String reset=GuiI18n.localize(guiName, "reset", new Object[0]);
+	private String resetAll=GuiI18n.localize(guiName, "resetAll", new Object[0]);
 	//<--Localize Gui
 
-	public CustomGuiTextAndFontStyleEditor(Minecraft MC,
-			FontRenderer FontRenderer, List<GuiButton> screenButtonList,
-			int ID, int X, int Y) {
-		
-		this.fontRendererObj=FontRenderer;
-		this.ID=ID;
-		this.lastButtonID=ID + 6;
-		this.xPosition=X;
-		this.yPosition=Y;
-		
-		this.currentFontStyle = FontStyles.RESET;
-		this.editTextField = new GuiTextField(this.fontRendererObj,
-				this.xPosition * 4 - 360 / 2, this.yPosition / 6 * 18, 360, 15);
-		this.editTextField.setMaxStringLength(256);
-		this.buttonList.add(this.shadowBtn = new GuiButton(ID, this.xPosition
-				- ButtonSize[0] / 2, this.yPosition, ButtonSize[0],
-				ButtonSize[1]+2, shadow+" "+ OnOffStr[0]));
-		this.buttonList.add(this.boldBtn = new GuiButton(ID + 1, this.xPosition
-				- ButtonSize[0] / 2, this.yPosition + (ButtonSize[1] + 2),
-				ButtonSize[0] / 2, ButtonSize[1]+2, "\u00a7l[B]\u00a7r "
-						+ FontStyles.BOLD.styleDisplayCode));
-		this.buttonList.add(this.strikethroughBtn = new GuiButton(ID + 2,
-				this.xPosition, this.yPosition + (ButtonSize[1] + 2),
-				ButtonSize[0] / 2, ButtonSize[1]+2, "\u00a7m[S]\u00a7r "
-						+ FontStyles.STRIKETHROUGH.styleDisplayCode));
-		this.buttonList.add(this.underlineBtn = new GuiButton(ID + 3,
-				this.xPosition - ButtonSize[0] / 2, this.yPosition
-						+ (ButtonSize[1] + 2) * 2, ButtonSize[0] / 2,
-				ButtonSize[1]+2, "\u00a7n[U]\u00a7r "
-						+ FontStyles.UNDERLINE.styleDisplayCode));
-		this.buttonList.add(this.italicBtn = new GuiButton(ID + 4,
-				this.xPosition, this.yPosition + (ButtonSize[1] + 2) * 2,
-				ButtonSize[0] / 2, ButtonSize[1]+ 2, "\u00a7o[I]\u00a7r "
-						+ FontStyles.ITALIC.styleDisplayCode));
-		this.buttonList.add(this.resetBtn = new GuiButton(ID + 5,
-				this.xPosition - ButtonSize[0] / 2, this.yPosition
-						+ (ButtonSize[1] + 2) * 3, ButtonSize[0],
-				ButtonSize[1]+ 2, reset+" "+ FontStyles.RESET.styleDisplayCode));
-		this.buttonList.add(this.resetAllBtn = new GuiButton(ID + 6,
-				this.xPosition - ButtonSize[0] / 2, this.yPosition
-						+ (ButtonSize[1] + 2) * 4, ButtonSize[0],
-				ButtonSize[1]+2, resetAll));
-		screenButtonList.addAll(this.buttonList);
-		CustomGuiTextAndFontStyleEditor.FontStyles.SHADOW.enable = false;
-	}
 
+	public CustomGuiTextAndFontStyleEditor(int ID,Minecraft MC,FontRenderer font,GuiMainScreen parent,
+			int x, int y,int width,int height) {
+		super(ID, MC, font, parent, x, y, width, height);
+	}
+	
+	
 	@Override
-	public void drawScreen(int mouseX,int mouseY,float par3) {
+	public void drawScreen(int mouseX, int mouseY, float par3) {
 		if (this.isVisible) {
 			this.editTextField.drawTextBox();
 			this.drawCenteredString(this.fontRendererObj, title,
-					this.xPosition, this.yPosition - 13, 16777215);
+					this.GroupX+this.width/2, this.GroupY, 16777215);
 			this.drawCenteredString(this.fontRendererObj, editMsg,
-					this.xPosition * 4, this.yPosition / 6 * 16, 16777215);
+					this.GroupX+this.width/2, this.GroupY+fixH(this.gridHeight*10), 16777215);
 		}
+		
+	}
+
+	@Override
+	protected void keyTyped(char character, int code) {
+		this.editTextField.textboxKeyTyped(character, code);
+	}
+
+	@Override
+	protected void mouseClicked(int x, int y, int buttonClicked) {
+		if (buttonClicked == 0){
+		this.editTextField.mouseClicked(x, y, buttonClicked);
+		}
+	}
+
+	/**
+	 *Define action performed of the button.
+	 */
+	@Override
+	protected void actionPerformed(GuiButton button) {
+		if (button.enabled) {
+			if (button.id == this.shadowBtn.id) {
+				this.currentFontStyle = FontStyles.SHADOW;
+				FontStyles.SHADOW.enable = !FontStyles.SHADOW.enable;
+
+				if (button.displayString.contains(OnOffStr[0]))
+					button.displayString = button.displayString.replace(OnOffStr[0],
+							OnOffStr[1]);
+				else
+					button.displayString = button.displayString.replace(OnOffStr[1],
+							OnOffStr[0]);
+			}
+			if (button.id == this.boldBtn.id) {
+				this.currentFontStyle = FontStyles.BOLD;
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
+			}
+
+			if (button.id == this.strikethroughBtn.id) {
+				this.currentFontStyle = FontStyles.STRIKETHROUGH;
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
+			}
+
+			if (button.id == this.underlineBtn.id) {
+				this.currentFontStyle = FontStyles.UNDERLINE;
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
+			}
+
+			if (button.id == this.italicBtn.id) {
+				this.currentFontStyle = FontStyles.ITALIC;
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
+			}
+
+			if (button.id == this.resetBtn.id) {
+				this.currentFontStyle = FontStyles.RESET;
+				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
+				this.editTextField.setFocused(true);
+			}
+
+			if (button.id == this.resetAllBtn.id) {
+				this.currentFontStyle = FontStyles.RESETALL;
+				this.editTextField.setText(this
+						.formatStringClear(this.editTextField.getText()));
+				FontStyles.SHADOW.enable = false;
+				if (this.shadowBtn.displayString.contains(OnOffStr[1]))
+					this.shadowBtn.displayString = this.shadowBtn.displayString
+							.replace(OnOffStr[1], OnOffStr[0]);
+			}
+
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void initGui() {
+		this.buttonList.clear();
+		this.buttonList.add(this.shadowBtn = 
+				new GuiButton(id, this.GroupX, this.GroupY+fixH(this.gridHeight*3), fixW(this.gridWidth*9),20, shadow+" "+ OnOffStr[0]));
+		this.buttonList.add(this.boldBtn = 
+				new GuiButton(id + 1, this.GroupX+fixW(this.gridWidth*9), this.GroupY+fixH(this.gridHeight*3),fixW(this.gridWidth*9),20, "\u00a7l[B]\u00a7r "+ FontStyles.BOLD.styleDisplayCode));
+		this.buttonList.add(this.strikethroughBtn = 
+				new GuiButton(id + 2,this.GroupX+fixW(this.gridWidth*18), this.GroupY+fixH(this.gridHeight*3) ,fixW(this.gridWidth*9),20, "\u00a7m[S]\u00a7r "+ FontStyles.STRIKETHROUGH.styleDisplayCode));
+		this.buttonList.add(this.underlineBtn = 
+				new GuiButton(id + 3,this.GroupX+fixW(this.gridWidth*27), this.GroupY+fixH(this.gridHeight*3) ,fixW(this.gridWidth*9),20, "\u00a7n[U]\u00a7r "+ FontStyles.UNDERLINE.styleDisplayCode));
+		this.buttonList.add(this.italicBtn = 
+				new GuiButton(id + 4,this.GroupX+fixW(this.gridWidth*36), this.GroupY+fixH(this.gridHeight*3) ,fixW(this.gridWidth*9),20, "\u00a7o[I]\u00a7r "+ FontStyles.ITALIC.styleDisplayCode));
+		this.buttonList.add(this.resetBtn = 
+				new GuiButton(id + 5,this.GroupX+fixW(this.gridWidth*45), this.GroupY+fixH(this.gridHeight*3) ,fixW(this.gridWidth*9),20, reset+" "+ FontStyles.RESET.styleDisplayCode));
+		this.buttonList.add(this.resetAllBtn = 
+				new GuiButton(id + 6,this.GroupX+fixW(this.gridWidth*54), this.GroupY+fixH(this.gridHeight*3) ,fixW(this.gridWidth*9),20, resetAll));
+		this.parentButtonList.addAll(this.buttonList);
+		
+		this.editTextField = new GuiTextField(this.fontRendererObj,
+				this.GroupX, this.GroupY+fixH(this.gridHeight*14), this.width, fixH(this.gridHeight*5));
+		this.editTextField.setMaxStringLength(256);
+		
+		this.currentFontStyle = FontStyles.RESET;
+		FontStyles.SHADOW.enable = false;
+	}
+
+	@Override
+	public void updateScreen() {
+		this.editTextField.updateCursorCounter();
 	}
 
 	public void setVisible(boolean isVisible) {
@@ -146,88 +203,26 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 			FontStyles.SHADOW.enable = isVisible;
 		}
 		for (int i = 0; i < this.buttonList.size(); i++) {
-			this.buttonList.get(i).visible = isVisible;
-			this.buttonList.get(i).enabled = isVisible;
+			((GuiButton)this.buttonList.get(i)).visible = isVisible;
+			((GuiButton)this.buttonList.get(i)).enabled = isVisible;
 		}
 
 	}
-
-	@Override
-	public void updateScreen() {
-		this.editTextField.updateCursorCounter();
-	}
-
-	@Override
-	protected void actionPerformed(GuiButton btn) {
-		if (btn.enabled) {
-			if (btn.id == this.ID) {
-				this.currentFontStyle = FontStyles.SHADOW;
-				FontStyles.SHADOW.enable = !FontStyles.SHADOW.enable;
-
-				if (btn.displayString.contains(OnOffStr[0]))
-					btn.displayString = btn.displayString.replace(OnOffStr[0],
-							OnOffStr[1]);
-				else
-					btn.displayString = btn.displayString.replace(OnOffStr[1],
-							OnOffStr[0]);
-			}
-			if (btn.id == this.ID + 1) {
-				this.currentFontStyle = FontStyles.BOLD;
-				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
-				this.editTextField.setFocused(true);
-			}
-
-			if (btn.id == this.ID + 2) {
-				this.currentFontStyle = FontStyles.STRIKETHROUGH;
-				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
-				this.editTextField.setFocused(true);
-			}
-
-			if (btn.id == this.ID + 3) {
-				this.currentFontStyle = FontStyles.UNDERLINE;
-				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
-				this.editTextField.setFocused(true);
-			}
-
-			if (btn.id == this.ID + 4) {
-				this.currentFontStyle = FontStyles.ITALIC;
-				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
-				this.editTextField.setFocused(true);
-			}
-
-			if (btn.id == this.ID + 5) {
-				this.currentFontStyle = FontStyles.RESET;
-				this.editTextField.writeText(this.currentFontStyle.styleDisplayCode);
-				this.editTextField.setFocused(true);
-			}
-
-			if (btn.id == this.ID + 6) {
-				this.currentFontStyle = FontStyles.RESETALL;
-				this.editTextField.setText(this
-						.formatStringClear(this.editTextField.getText()));
-				FontStyles.SHADOW.enable = false;
-				if (this.shadowBtn.displayString.contains(OnOffStr[1]))
-					this.shadowBtn.displayString = this.shadowBtn.displayString
-							.replace(OnOffStr[1], OnOffStr[0]);
-			}
-
-		}
-	}
-
+	
 	protected String formatStringChange(String str) {
 		String[] displycodes = {
-				CustomGuiTextAndFontStyleEditor.FontStyles.BOLD.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.ITALIC.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.RESET.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.STRIKETHROUGH.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.UNDERLINE.styleDisplayCode };
+				FontStyles.BOLD.styleDisplayCode,
+				FontStyles.ITALIC.styleDisplayCode,
+				FontStyles.RESET.styleDisplayCode,
+				FontStyles.STRIKETHROUGH.styleDisplayCode,
+				FontStyles.UNDERLINE.styleDisplayCode };
 
 		String[] formatcodes = {
-				CustomGuiTextAndFontStyleEditor.FontStyles.BOLD.styleCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.ITALIC.styleCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.RESET.styleCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.STRIKETHROUGH.styleCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.UNDERLINE.styleCode };
+				FontStyles.BOLD.styleCode,
+				FontStyles.ITALIC.styleCode,
+				FontStyles.RESET.styleCode,
+				FontStyles.STRIKETHROUGH.styleCode,
+				FontStyles.UNDERLINE.styleCode };
 
 		StrBuilder strb = new StrBuilder(str);
 		for (int i = 0; i < displycodes.length; i++)
@@ -235,28 +230,15 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 
 		return strb.toString();
 	}
-
-	@Override
-	protected void keyTyped(char par1, int par2) {
-
-		this.editTextField.textboxKeyTyped(par1, par2);
-	}
-
-	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int par3) {
-		if (par3 == 0){
-		this.editTextField.mouseClicked(mouseX, mouseY, par3);
-		}
-	}
-
+	
 	private String formatStringClear(String str) {
 
 		String[] displycodes = {
-				CustomGuiTextAndFontStyleEditor.FontStyles.BOLD.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.ITALIC.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.RESET.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.STRIKETHROUGH.styleDisplayCode,
-				CustomGuiTextAndFontStyleEditor.FontStyles.UNDERLINE.styleDisplayCode };
+				FontStyles.BOLD.styleDisplayCode,
+				FontStyles.ITALIC.styleDisplayCode,
+				FontStyles.RESET.styleDisplayCode,
+				FontStyles.STRIKETHROUGH.styleDisplayCode,
+				FontStyles.UNDERLINE.styleDisplayCode };
 
 		StrBuilder strb = new StrBuilder(str);
 		if (this.editTextField.getText() != null)
@@ -265,5 +247,5 @@ public class CustomGuiTextAndFontStyleEditor extends GuiScreen {
 
 		return strb.toString();
 	}
-	
 }
+
