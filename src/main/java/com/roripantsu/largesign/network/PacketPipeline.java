@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 
@@ -47,7 +48,7 @@ public class PacketPipeline {
 	private BiMap<Integer, String> channelsList = HashBiMap.create();
 	private boolean isPostInitialised = false;
 
-	private LinkedList<Class<? extends AbsPacket>> packetsList = new LinkedList<Class<? extends AbsPacket>>();
+	private LinkedList<Class<? extends Packet>> packetsList = new LinkedList<Class<? extends Packet>>();
 
 	public PacketPipeline() {
 		packetPipeline = this;
@@ -69,7 +70,7 @@ public class PacketPipeline {
 
 		ByteBuf payload = proxyPacket.payload();
 		byte discriminator = payload.readByte();
-		Class<? extends AbsPacket> theClass = this.packetsList
+		Class<? extends Packet> theClass = this.packetsList
 				.get(discriminator);
 
 		if (theClass == null) {
@@ -77,15 +78,15 @@ public class PacketPipeline {
 					"No packet registered for discriminator: " + discriminator);
 		}
 
-		AbsPacket thePacket = theClass.newInstance();
-		thePacket.decodePacket(new PacketBuffer(payload.slice()));
+		Packet thePacket = theClass.newInstance();
+		thePacket.readPacketData(new PacketBuffer(payload.slice()));
 
 		switch (FMLCommonHandler.instance().getEffectiveSide()) {
 		case CLIENT:
 			NetHandlerPlayClientSide NHPCS = new NetHandlerPlayClientSide(
 					Minecraft.getMinecraft(), Minecraft.getMinecraft().currentScreen,
 					Minecraft.getMinecraft().getNetHandler().getNetworkManager());
-			thePacket.handleClientSide(NHPCS, this.getEntityPlayer());
+			thePacket.processPacket(NHPCS);
 			break;
 		case SERVER:
 			NetHandlerPlayServer netHandler = (NetHandlerPlayServer) NetworkRegistry.INSTANCE
@@ -94,17 +95,17 @@ public class PacketPipeline {
 			NetHandlerPlayServerSide NHPSS = new NetHandlerPlayServerSide(
 					MinecraftServer.getServer(), netHandler.playerEntity,
 					netHandler.netManager);
-			thePacket.handleServerSide(NHPSS, netHandler.playerEntity);
+			thePacket.processPacket(NHPSS);
 			break;
 		default:
 		}
 		out.add(thePacket);
 	}
 
-	public void encode(AbsPacket thePacket, int channelKey, List<Object> out)
+	public void encode(Packet thePacket, int channelKey, List<Object> out)
 			throws Exception {
 		PacketBuffer packetBuffer = new PacketBuffer(Unpooled.buffer());
-		Class<? extends AbsPacket> theClass = thePacket.getClass();
+		Class<? extends Packet> theClass = thePacket.getClass();
 
 		if (!this.packetsList.contains(thePacket.getClass())) {
 			throw new NullPointerException("No Packet Registered for: "
@@ -113,12 +114,12 @@ public class PacketPipeline {
 
 		byte discriminator = (byte) this.packetsList.indexOf(theClass);
 		packetBuffer.writeByte(discriminator);
-		thePacket.encodePacket(packetBuffer);
+		thePacket.writePacketData(packetBuffer);
 		FMLProxyPacket proxyPacket = new FMLProxyPacket(packetBuffer.copy(),
 				this.channelsList.get(channelKey));
 		out.add(proxyPacket);
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public EntityPlayer getEntityPlayer() {
 		return Minecraft.getMinecraft().thePlayer;
@@ -137,11 +138,11 @@ public class PacketPipeline {
 
 		this.isPostInitialised = true;
 		Collections.sort(this.packetsList,
-				new Comparator<Class<? extends AbsPacket>>() {
+				new Comparator<Class<? extends Packet>>() {
 
 					@Override
-					public int compare(Class<? extends AbsPacket> theClass1,
-							Class<? extends AbsPacket> theClass2) {
+					public int compare(Class<? extends Packet> theClass1,
+							Class<? extends Packet> theClass2) {
 						int com = String.CASE_INSENSITIVE_ORDER.compare(
 								theClass1.getCanonicalName(),
 								theClass2.getCanonicalName());
@@ -159,7 +160,7 @@ public class PacketPipeline {
 		this.channels.register(obj);
 	}
 
-	public boolean registerPacket(Class<? extends AbsPacket> theClass) {
+	public boolean registerPacket(Class<? extends Packet> theClass) {
 		if (this.packetsList.size() > 256) {
 			logger.debug("packetsList.size() > 256");
 			return false;

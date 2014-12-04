@@ -173,6 +173,8 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		this.tileLargeSign.scaleAdjust = this.Adjuter.adjust[0];
 		this.tileLargeSign.XAdjust = this.Adjuter.adjust[1];
 		this.tileLargeSign.YAdjust = this.Adjuter.adjust[2];
+		if(this.iconList.selectedItemStack!=null)
+			this.tileLargeSign.setItemStack(this.iconList.selectedItemStack);
 	}
 
 	@Override
@@ -183,11 +185,10 @@ public class GuiEditLargeSign extends GuiMainScreen {
 			this.fontRendererObj.setBidiFlag(false);
 		}
 
-		this.tileLargeSign.writeToNBT(this.tileLargeSign.getNBTTC());
-		CPacketUpdateLargeSign thePacketC = new CPacketUpdateLargeSign(
-				this.tileLargeSign.getNBTTC());
-		SPacketUpdateLargeSign thePacketS = new SPacketUpdateLargeSign(
-				this.tileLargeSign.getNBTTC());
+		CPacketUpdateLargeSign thePacketC = 
+				new CPacketUpdateLargeSign(this.tileLargeSign);
+		SPacketUpdateLargeSign thePacketS = 
+				new SPacketUpdateLargeSign(this.tileLargeSign);
 
 		try {
 			List<Object> list = new LinkedList<Object>();
@@ -199,6 +200,7 @@ public class GuiEditLargeSign extends GuiMainScreen {
 			FMLProxyPacket pktS = (FMLProxyPacket) list.get(1);
 			Mod_LargeSign.proxy.packetPipeline.sendToServer(pktC);
 			Mod_LargeSign.proxy.packetPipeline.sendToAll(pktS);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -237,8 +239,9 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		int k = this.mc.theWorld.getBlockMetadata(this.tileLargeSign.xCoord,
 				this.tileLargeSign.yCoord, this.tileLargeSign.zCoord);
 		
-		GL11.glColor4f(1F, 1F, 1F, 1F);
+		
 		GL11.glPushMatrix();
+		GL11.glColor4f(1F, 1F, 1F, 1F);
 		GL11.glTranslatef(this.width / 2F, fixH(fixH(fixH(this.gridHeight*4))), 50.0F);
 		GL11.glScalef(-SizePercent, -SizePercent, -SizePercent);
 		GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);

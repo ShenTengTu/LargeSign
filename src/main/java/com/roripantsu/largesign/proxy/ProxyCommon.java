@@ -44,8 +44,6 @@ public class ProxyCommon {
 		packetPipeline.registerPacket(SPacketUpdateLargeSign.class);
 		packetPipeline.registerPacket(SPacketLargeSignEditorOpen.class);
 		packetPipeline.registerPacket(CPacketUpdateLargeSign.class);
-		
-		
 	}
 
     public void postInit(FMLPostInitializationEvent e) {
@@ -63,8 +61,8 @@ public class ProxyCommon {
 		for(int i=0;i<items.length;i++){
 			GameRegistry.addRecipe(new ItemStack(block_LargeSign, 3,i), new Object[] {
 				"SSS", "SIS", "SSS", 'S', items[i] ,'I',Items.item_frame});
-			
 		}
+		
     }
     
 }

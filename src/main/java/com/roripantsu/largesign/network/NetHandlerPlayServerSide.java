@@ -41,48 +41,45 @@ public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
 		this.playerEntity.func_143004_u();
 		WorldServer worldserver = this.serverController
 				.worldServerForDimension(this.playerEntity.dimension);
-
-		if (worldserver.blockExists(thePacket.getXCoordinate(),
-				thePacket.getYCoordinate(), thePacket.getZCoordinate())) {
-			TileEntity tileentity = worldserver.getTileEntity(
-					thePacket.getXCoordinate(), thePacket.getYCoordinate(),
-					thePacket.getZCoordinate());
-
+		int x=thePacket.getXCoordinate();
+		int y=thePacket.getYCoordinate();
+		int z=thePacket.getZCoordinate();
+		
+		if (worldserver.blockExists(x,y,z)) {
+			TileEntity tileentity = worldserver.getTileEntity(x,y,z);
 			if (tileentity instanceof TileEntityLargeSign) {
-				TileEntityLargeSign tileentitylagesign = (TileEntityLargeSign) tileentity;
+				TileEntityLargeSign tileEntityLargeSign = (TileEntityLargeSign) tileentity;
 
-				if (!tileentitylagesign.isEditable()
-						|| tileentitylagesign.getEntityPlayer() != this.playerEntity) {
+				if (!tileEntityLargeSign.isEditable()
+						|| tileEntityLargeSign.getEntityPlayer() != this.playerEntity) {
 					this.serverController.logWarning("Player "
 							+ this.playerEntity.getCommandSenderName()
 							+ " just tried to change non-editable sign");
 					return;
 				}
-			}
+			
 
-			boolean flag = true;
+				boolean flag = true;
 
-			if (thePacket.geTheString()[0].length() > 64) {
-				flag = false;
-			} else {
-				for (int i = 0; i < thePacket.geTheString()[0].length(); ++i) {
-					if (!ChatAllowedCharacters.isAllowedCharacter(thePacket
-							.geTheString()[0].charAt(i))) {
-						flag = false;
+				if (thePacket.geTheString()[0].length() > 256) {
+					flag = false;
+				} else {
+					for (int i = 0; i < thePacket.geTheString()[0].length(); ++i) {
+						if (!ChatAllowedCharacters.isAllowedCharacter(thePacket
+								.geTheString()[0].charAt(i))) {
+							flag = false;
+						}
 					}
 				}
-			}
 
-			if (!flag) {
-				thePacket.geTheString()[0] = "\u0000";
-			}
+				if (!flag) {
+					thePacket.geTheString()[0] = "\u0000";
+				}
 
-			if (tileentity instanceof TileEntityLargeSign) {
-				TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) tileentity;
-				tileentitylargesign.readFromNBT(thePacket.getNBTTC());
-				tileentitylargesign.markDirty();
-				worldserver.markBlockForUpdate(thePacket.getXCoordinate(),
-						thePacket.getYCoordinate(), thePacket.getZCoordinate());
+				tileEntityLargeSign.readFromNBT(thePacket.getMainNBTTC());
+				tileEntityLargeSign.markDirty();
+				worldserver.markBlockForUpdate(x,y,z);
+				
 			}
 		}
 	}

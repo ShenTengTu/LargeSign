@@ -125,13 +125,15 @@ public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
 			else {
 				this.theBlock.onBlockPlacedBy(world, x, y, z, entityPlayer, itemStack);//for Sub Block or Item
 				world.setBlock(x, y, z, this.theBlock, side, 3);
+				
 	            --itemStack.stackSize;
 
 				TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) world
 						.getTileEntity(x, y, z);
-				
-				if (tileentitylargesign != null){
-					this.func_LargeSign(entityPlayer, tileentitylargesign);
+
+				if (tileentitylargesign != null){			        
+					tileentitylargesign.setSide(side);
+					this.func_LargeSign(entityPlayer,tileentitylargesign);
 				}
 
 				return true;
@@ -144,9 +146,8 @@ public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
 		if (entityPlayer instanceof EntityPlayerMP) {
 			tileEntity.setEntityPlayer(entityPlayer);
 			
-			SPacketLargeSignEditorOpen thePacket = new SPacketLargeSignEditorOpen(
-					tileEntity.xCoord, tileEntity.yCoord, tileEntity.zCoord,
-					tileEntity.getTheMetadata());//for Sub Block or Item
+			SPacketLargeSignEditorOpen thePacket = 
+					new SPacketLargeSignEditorOpen(tileEntity);
 
 			try {
 				List<Object> list = new LinkedList<Object>();

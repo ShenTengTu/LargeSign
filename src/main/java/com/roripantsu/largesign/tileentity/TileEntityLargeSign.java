@@ -2,6 +2,7 @@ package com.roripantsu.largesign.tileentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -29,6 +30,8 @@ public class TileEntityLargeSign extends TileEntity {
 	private EntityPlayer entityPlayer;
 	private NBTTagCompound NBTTC = new NBTTagCompound();
 	private int theMetadata=0;//for Sub Block or Item
+	private int side;
+	private ItemStack itemStack;
 
 	@Override
 	public Packet getDescriptionPacket() {
@@ -48,6 +51,14 @@ public class TileEntityLargeSign extends TileEntity {
 
 	public boolean isEditable() {
 		return this.Editable;
+	}
+
+	public int getSide() {
+		return this.side;
+	}
+
+	public void setSide(int value) {
+		this.side = value;
 	}
 
 	@Override
@@ -80,6 +91,9 @@ public class TileEntityLargeSign extends TileEntity {
 		this.XAdjust = NBTTC.getFloat("XAdjust");
 		this.YAdjust = NBTTC.getFloat("YAdjust");
 		this.scaleAdjust = NBTTC.getFloat("scaleAdjust");
+		this.side=NBTTC.getInteger("side");
+		if(NBTTC.hasKey("itemStack"))
+			this.itemStack=ItemStack.loadItemStackFromNBT(NBTTC.getCompoundTag("itemStack"));
 		this.NBTTC = NBTTC;
 
 	}
@@ -118,6 +132,9 @@ public class TileEntityLargeSign extends TileEntity {
 		NBTTC.setFloat("YAdjust", this.YAdjust);
 		NBTTC.setFloat("scaleAdjust", this.scaleAdjust);
 		NBTTC.setString("largeSignText", this.largeSignText[0]);
+		NBTTC.setInteger("side",this.side);
+		if(this.itemStack!=null)
+			NBTTC.setTag("itemStack", this.itemStack.writeToNBT(new NBTTagCompound()));
 		this.NBTTC = NBTTC;
 	}
 	
@@ -129,6 +146,14 @@ public class TileEntityLargeSign extends TileEntity {
 	//for Sub Block or Item
 	public void setTheMetadata(int Metadata) {
 		this.theMetadata = Metadata;
+	}
+
+	public ItemStack getItemStack() {
+		return itemStack;
+	}
+
+	public void setItemStack(ItemStack itemStack) {
+		this.itemStack = itemStack;
 	}
 
 }

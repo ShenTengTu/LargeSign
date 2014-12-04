@@ -159,16 +159,17 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 		/*when the specified neighbor block is not solid,
 		this block will be destroyed and drops its item. */
 		if (flag) {
-			TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) world
-					.getTileEntity(x, y, z);
-			if(tileentitylargesign != null){
+	       
+			this.thetileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);
+			if(this.thetileEntity != null){
+				//for Sub Block or Item
 				this.dropBlockAsItem(world, x, y, z,
-						tileentitylargesign.getTheMetadata(), 0);//for Sub Block or Item
+						this.thetileEntity.getTheMetadata(), 0);
+				
 				world.setBlockToAir(x, y, z);
+				
 			}
 		}
-
-		super.onNeighborBlockChange(world, x, y, z, theBlock);
 	}
 	
 	//for Sub Block or Item
@@ -251,6 +252,7 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
     @Override
     public void onBlockPlacedBy(World world,int x,int y,int z,EntityLivingBase entityPlayer,ItemStack itemStack){
     	this.theMetadata=itemStack.getItemDamage();
+    	this.thetileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);
     }
    
     //for Sub Block or Item
@@ -262,9 +264,9 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
     
     //for Sub Block or Item
     @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z)
+    public boolean removedByPlayer(World world, EntityPlayer entityPlayer, int x, int y, int z)
     {
-        this.thetileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);
+        this.thetileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);      
     	return world.setBlockToAir(x, y, z);
     }
     

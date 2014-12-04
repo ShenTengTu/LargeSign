@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -56,12 +57,14 @@ public class CustomGuiIconList extends GuiSubScreen {
 	private int page = 1;
 	int selectedItemID = 1;
 	int selectedItemMatadata = 0;
+	ItemStack selectedItemStack;
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
 	private String prev=GuiI18n.localize(guiName, "prev", new Object[0]);
 	private String next=GuiI18n.localize(guiName, "next", new Object[0]);
 	//<--Localize Gui
+	
 
 	public CustomGuiIconList(int ID,Minecraft MC,FontRenderer font,GuiMainScreen parent,
 			int x, int y,int width,int height) {
@@ -170,10 +173,10 @@ public class CustomGuiIconList extends GuiSubScreen {
 		}
 
 		if (button.id >= this.nextBtn.id+1) {
-			;
-			ItemStack itemStack = ((CustomGuiButton) button).getItemStack();
-			this.selectedItemID = Item.getIdFromItem(itemStack.getItem());
-			this.selectedItemMatadata = itemStack.getItemDamage();
+			this.selectedItemStack=((CustomGuiButton) button).getItemStack();
+			NBTTagCompound nbt= this.selectedItemStack.writeToNBT(new NBTTagCompound());
+			this.selectedItemID = nbt.getInteger("id");
+			this.selectedItemMatadata = nbt.getInteger("Damage");
 		}
 	}
 

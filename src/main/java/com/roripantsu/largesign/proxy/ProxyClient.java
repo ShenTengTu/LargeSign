@@ -38,6 +38,7 @@ public class ProxyClient extends ProxyCommon {
 		ClientRegistry.registerTileEntity(TileEntityLargeSign.class,
 				TileEntityLargeSign.class.getSimpleName(),
 				new TileEntityLargeSignRenderer());
+		
 	}
 	
 }

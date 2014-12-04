@@ -44,43 +44,48 @@ public class NetHandlerPlayClientSide extends NetHandlerPlayClient {
 	}
 
 	public void handleLargeSignEditorOpen(SPacketLargeSignEditorOpen thePacket) {
-
-		Object object = this.gameController.theWorld.getTileEntity(
-				thePacket.getXCoordinate(), thePacket.getYCoordinate(),
-				thePacket.getZCoordinate());
-
-		if (object == null) {
-			object = new TileEntityLargeSign();
-			((TileEntity) object).setWorldObj(this.clientWorldController);
-			((TileEntity) object).xCoord = thePacket.getXCoordinate();
-			((TileEntity) object).yCoord = thePacket.getYCoordinate();
-			((TileEntity) object).zCoord = thePacket.getZCoordinate();
+		int x=thePacket.getXCoordinate();
+		int y=thePacket.getYCoordinate();
+		int z=thePacket.getZCoordinate();
+		int theMetadata=thePacket.getTheMetadata();//for Sub Block or Item
+		int side=thePacket.getSide();
+		
+		TileEntity tileEntity = this.gameController.theWorld.getTileEntity(x,y,z);
+		
+		if (tileEntity == null) {
+			tileEntity = new TileEntityLargeSign();
+			tileEntity.setWorldObj(this.clientWorldController);
+			tileEntity.xCoord = x;
+			tileEntity.yCoord = y;
+			tileEntity.zCoord = z;
 			//for Sub Block or Item
-			((TileEntityLargeSign) object).setTheMetadata(thePacket.getTheMetadata());
+			((TileEntityLargeSign) tileEntity).setTheMetadata(theMetadata);
+			((TileEntityLargeSign) tileEntity).setSide(side);
+				
 		}
 
 		this.gameController.displayGuiScreen(new GuiEditLargeSign(
-				(TileEntityLargeSign) object));
+				(TileEntityLargeSign) tileEntity));
 
 	}
 
 	public void handleUpdateLargeSign(SPacketUpdateLargeSign thePacket) {
+		WorldClient worldClient=this.gameController.theWorld;
 		boolean flag = false;
-		if (this.gameController.theWorld.blockExists(
-				thePacket.getxCoordinate(), thePacket.getyCoordinate(),
-				thePacket.getzCoordinate())) {
-			TileEntity tileentity = this.gameController.theWorld.getTileEntity(
-					thePacket.getxCoordinate(), thePacket.getyCoordinate(),
-					thePacket.getzCoordinate());
+		int x=thePacket.getxCoordinate();
+		int y=thePacket.getyCoordinate();
+		int z=thePacket.getzCoordinate();
+		
+		if (worldClient.blockExists(x,y,z)) {
+			TileEntity tileentity = worldClient.getTileEntity(x,y,z);
 
 			if (tileentity instanceof TileEntityLargeSign) {
-				TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) tileentity;
+				TileEntityLargeSign tileEntityLargeSign = (TileEntityLargeSign) tileentity;
+				
+				if (tileEntityLargeSign.isEditable()) {
 
-				if (tileentitylargesign.isEditable()) {
-
-					tileentitylargesign.readFromNBT(thePacket.getNBTTC());
-
-					tileentitylargesign.markDirty();
+					tileEntityLargeSign.readFromNBT(thePacket.getMainNBTTC());
+					tileEntityLargeSign.markDirty();					
 				}
 
 				flag = true;
@@ -89,11 +94,8 @@ public class NetHandlerPlayClientSide extends NetHandlerPlayClient {
 
 		if (!flag && this.gameController.thePlayer != null) {
 			this.gameController.thePlayer.addChatMessage(new ChatComponentText(
-					"Unable to locate LargeSign at "
-							+ thePacket.getxCoordinate() + ", "
-							+ thePacket.getxCoordinate() + ", "
-							+ thePacket.getzCoordinate()));
+					"Unable to locate LargeSign at "+ x + ", "+ y + ", "+ z));
 		}
 	}
-
+	
 }
