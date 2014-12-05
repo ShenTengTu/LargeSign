@@ -1,5 +1,7 @@
 package com.roripantsu.largesign.tileentity;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -53,7 +55,8 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 	private CustomFontRenderer fontrenderer;
 	private Minecraft MC = Minecraft.getMinecraft();
 	private final Model_LargeSign modelLargeSign = new Model_LargeSign();
-
+	private boolean multipleLine=false;
+	
 	@Override
 	public void renderTileEntityAt(TileEntity tileEntity, double render_xCoord,
 			double render_yCoord, double render_zCoord, float FL) {
@@ -98,8 +101,6 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 			this.renderString(tileEntityLargeSign);
 			break;
 		case 1:
-			/*this.renderItemIcon(new ItemStack(Item.getItemById(itemID), 1,
-					itemMetadata));*/
 			this.renderItemIcon(tileEntityLargeSign);
 			break;
 		}
@@ -190,11 +191,19 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 
                 if (textureatlassprite.getFrameCount() > 0)
                     textureatlassprite.updateAnimation();
-            }
-            
-            
+            }  
         }
-
+		
+		if(!tileEntity.getNBTTC().hasKey("itemStack")){
+			 GL11.glPushMatrix();
+			 GL11.glTranslated(0.0D, 0.2D, 0.5D);
+			 tileEntity.largeSignText[0]="This Icon Will Disappear In After Version."
+			 		+ "Please Replace And You Will Not See These Words.";
+			 multipleLine=true;
+			 this.renderString(tileEntity);
+			 multipleLine=false;
+			 GL11.glPopMatrix();
+		}
 	}
 	
     private void renderString(TileEntityLargeSign tileEntity) {
@@ -244,10 +253,20 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_BLEND);
 		
-
+		if(multipleLine){
+			List<String> list=this.fontrenderer.listFormattedStringToWidth(str, 80);
+			int c=0;
+			for(String s:list){
+			this.fontrenderer.drawString(s,
+					-stringWidth / 2.0F,
+					-4.5F+c, color, hasShadow);
+			c+=this.fontrenderer.FONT_HEIGHT;
+			}
+		}else{
 		this.fontrenderer.drawString(displayString,
 			-stringWidth / 2.0F + adjust[1],
 			-4.5F + adjust[2], color, hasShadow);
+		}
 
 
 		GL11.glDepthMask(true);
