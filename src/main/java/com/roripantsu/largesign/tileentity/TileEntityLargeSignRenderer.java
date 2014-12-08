@@ -56,6 +56,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 	private Minecraft MC = Minecraft.getMinecraft();
 	private final Model_LargeSign modelLargeSign = new Model_LargeSign();
 	private boolean multipleLine=false;
+	public boolean showWarning=true;
 	
 	@Override
 	public void renderTileEntityAt(TileEntity tileEntity, double render_xCoord,
@@ -194,7 +195,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
             }  
         }
 		
-		if(!tileEntity.getNBTTC().hasKey("itemStack")){
+		if(!tileEntity.getNBTTC().hasKey("itemStack") && showWarning ){
 			 GL11.glPushMatrix();
 			 GL11.glTranslated(0.0D, 0.2D, 0.5D);
 			 tileEntity.largeSignText[0]="This Icon Will Disappear In After Version."

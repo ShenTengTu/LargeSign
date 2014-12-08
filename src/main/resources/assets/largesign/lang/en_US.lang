@@ -1,5 +1,10 @@
 itemGroup.tab_modRoriPantsu=RoriPantsu's Mod
-tile.Block_LargeSign_oak.name=Large sign
+tile.Block_LargeSign_oak.name=Large sign(oak)
+tile.Block_LargeSign_spruce.name=Large sign(spruce)
+tile.Block_LargeSign_birch.name=Large sign(birch)
+tile.Block_LargeSign_jungle.name=Large sign(jungle)
+tile.Block_LargeSign_acacia.name=Large sign(acacia)
+tile.Block_LargeSign_dark_oak.name=Large sign(dark oak)
 gui.CustomGuiColorSwitcher.title=Color Switcher:
 gui.CustomGuiIconList.prev=Prev
 gui.CustomGuiIconList.next=Next

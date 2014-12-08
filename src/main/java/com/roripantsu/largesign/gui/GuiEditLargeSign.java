@@ -18,6 +18,7 @@ import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.network.CPacketUpdateLargeSign;
 import com.roripantsu.largesign.network.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
+import com.roripantsu.largesign.tileentity.TileEntityLargeSignRenderer;
 
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
@@ -51,6 +52,8 @@ public class GuiEditLargeSign extends GuiMainScreen {
 	
 	public GuiEditLargeSign(TileEntityLargeSign tileEntity) {
 		this.tileLargeSign = tileEntity;
+		((TileEntityLargeSignRenderer)TileEntityRendererDispatcher.instance
+		.getSpecialRenderer(this.tileLargeSign)).showWarning=false;
 	}
 
 	@Override
@@ -206,6 +209,8 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		}
 
 		this.tileLargeSign.setEditable(true);
+		((TileEntityLargeSignRenderer)TileEntityRendererDispatcher.instance
+		.getSpecialRenderer(this.tileLargeSign)).showWarning=true;
 	}
 	
 	private void modeChange(int i) {

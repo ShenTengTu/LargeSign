@@ -5,7 +5,6 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import com.roripantsu.largesign.References;
@@ -57,10 +56,16 @@ public class ProxyCommon {
 				Block_LargeSign.class.getSimpleName());
 
 		/* Recipe */
-		Item[] items=new Item[]{new ItemStack(Blocks.planks,1,0).getItem()};
-		for(int i=0;i<items.length;i++){
+		ItemStack[] itemStacks=new ItemStack[]{
+				new ItemStack(Blocks.planks,1,0),
+				new ItemStack(Blocks.planks,1,1),
+				new ItemStack(Blocks.planks,1,2),
+				new ItemStack(Blocks.planks,1,3),
+				new ItemStack(Blocks.planks,1,4),
+				new ItemStack(Blocks.planks,1,5)};
+		for(int i=0;i<itemStacks.length;i++){
 			GameRegistry.addRecipe(new ItemStack(block_LargeSign, 3,i), new Object[] {
-				"SSS", "SIS", "SSS", 'S', items[i] ,'I',Items.item_frame});
+				"SSS", "SIS", "SSS", 'S', itemStacks[i] ,'I',Items.item_frame});
 		}
 		
     }

@@ -1,5 +1,10 @@
 itemGroup.tab_modRoriPantsu=RoriPantsu的模組
-tile.Block_LargeSign_oak.name=大型告示牌
+tile.Block_LargeSign_oak.name=大型告示牌(橡木)
+tile.Block_LargeSign_spruce.name=大型告示牌(杉木)
+tile.Block_LargeSign_birch.name=大型告示牌(樺木)
+tile.Block_LargeSign_jungle.name=大型告示牌(叢林木)
+tile.Block_LargeSign_acacia.name=大型告示牌(相思木)
+tile.Block_LargeSign_dark_oak.name=大型告示牌(黑橡木)
 gui.CustomGuiColorSwitcher.title=顏色切換:
 gui.CustomGuiIconList.prev=前頁
 gui.CustomGuiIconList.next=下頁

@@ -3,14 +3,11 @@ package com.roripantsu.largesign.texture;
 
 public enum ETextureResource {
 
-	/*Enttity_large_sign(Domain.LargeSign,"large_sign",
+	Enttity_large_sign(Domain.LargeSign,"large_sign",
 			new String[]{"oak","spruce","birch","jungle","acacia","dark_oak"}),
 	Item_large_sign(Domain.LargeSign,"item_large_sign",
-			new String[]{"oak","spruce","birch","jungle","acacia","dark_oak"});*/
+			new String[]{"oak","spruce","birch","jungle","acacia","dark_oak"});
 	
-	Enttity_large_sign(Domain.LargeSign,"large_sign",new String[]{"oak"}),
-	Item_large_sign(Domain.LargeSign,"item_large_sign",new String[]{"oak"});
-
 	
 	public static class BasePath{
 		public static final String Blocks="textures/blocks";
