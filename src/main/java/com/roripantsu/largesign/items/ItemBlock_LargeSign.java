@@ -16,10 +16,11 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
+import com.roripantsu.common.BasePath;
+import com.roripantsu.common.texture.CustomTextureSprite;
+import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.Mod_LargeSign;
-import com.roripantsu.largesign.network.SPacketLargeSignEditorOpen;
-import com.roripantsu.largesign.texture.CustomTextureSprite;
-import com.roripantsu.largesign.texture.ETextureResource;
+import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
@@ -61,9 +62,7 @@ public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
 		 for (int i = 0; i < subIcons.length;i++){
 		//load the specified resource to be block icon and register it.
 		CustomTextureSprite textureSprite=
-				new CustomTextureSprite(0,0,
-						ETextureResource.BasePath.Items,
-						textureNames[i]);
+				new CustomTextureSprite(BasePath.Items,textureNames[i]);
 		((TextureMap)iconRegister).setTextureEntry(textureNames[i], textureSprite);
 		subIcons[i]=textureSprite;
 		 }
@@ -151,8 +150,7 @@ public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
 
 			try {
 				List<Object> list = new LinkedList<Object>();
-				Mod_LargeSign.proxy.packetPipeline.encode(thePacket,
-						Mod_LargeSign.proxy.channelKey, list);
+				Mod_LargeSign.proxy.packetPipeline.encode(thePacket, list);
 				FMLProxyPacket pkt = (FMLProxyPacket) list.get(0);
 				Mod_LargeSign.proxy.packetPipeline.sendTo(pkt,
 						(EntityPlayerMP) entityPlayer);

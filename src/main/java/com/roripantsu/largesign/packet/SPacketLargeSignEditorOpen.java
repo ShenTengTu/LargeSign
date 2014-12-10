@@ -1,10 +1,12 @@
-package com.roripantsu.largesign.network;
+package com.roripantsu.largesign.packet;
 
 import java.io.IOException;
 
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
+import com.roripantsu.common.network.NetHandlerPlayClientSide;
+import com.roripantsu.common.network.ServerPacket;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import cpw.mods.fml.relauncher.Side;

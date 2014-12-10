@@ -1,4 +1,4 @@
-package com.roripantsu.largesign.network;
+package com.roripantsu.largesign.packet;
 
 import java.io.IOException;
 
@@ -7,16 +7,18 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
 
+import com.roripantsu.common.network.NetHandlerPlayClientSide;
+import com.roripantsu.common.network.ServerPacket;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
 /**
- *the packet which handle Updating Large Sign for client
+ *the packet which handle Updating Large Sign for sever
  *@author ShenTeng Tu(RoriPantsu)
  */
-public class CPacketUpdateLargeSign extends ClientPacket {
+public class SPacketUpdateLargeSign extends ServerPacket {
 
 	private NBTTagCompound mainNBTTC;
 	private boolean hasShadow;
@@ -31,19 +33,12 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 	private int side;
 	private ItemStack itemStack;
 
-	//for Server side
-	public CPacketUpdateLargeSign() {
-	}
-	
-	//for Client side
-	@SideOnly(Side.CLIENT)
-	public CPacketUpdateLargeSign(TileEntityLargeSign tileEntity) {
-		tileEntity.writeToNBT(this.mainNBTTC=new NBTTagCompound());
-		
+	public SPacketUpdateLargeSign() {
 	}
 
-	public String[] geTheString() {
-		return this.theString;
+	public SPacketUpdateLargeSign(TileEntityLargeSign tileEntity) {
+		tileEntity.writeToNBT(this.mainNBTTC=new NBTTagCompound());
+		
 	}
 
 	public int getItemID() {
@@ -58,24 +53,28 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 		return modeNumber;
 	}
 
+	@SideOnly(Side.CLIENT)
 	public NBTTagCompound getMainNBTTC() {
-		return mainNBTTC;
+		return this.mainNBTTC;
 	}
 
 	public int getTheColor() {
 		return theColor;
 	}
 
-	public int getXCoordinate() {
-		return this.xCoordinate;
+	@SideOnly(Side.CLIENT)
+	public int getxCoordinate() {
+		return xCoordinate;
 	}
 
-	public int getYCoordinate() {
-		return this.yCoordinate;
+	@SideOnly(Side.CLIENT)
+	public int getyCoordinate() {
+		return yCoordinate;
 	}
 
-	public int getZCoordinate() {
-		return this.zCoordinate;
+	@SideOnly(Side.CLIENT)
+	public int getzCoordinate() {
+		return zCoordinate;
 	}
 
 	public int getSide() {
@@ -111,7 +110,7 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 	}
 	
 	@Override
-	protected void handleServerSide(NetHandlerPlayServerSide netHandler) {
+	protected void handleClientSide(NetHandlerPlayClientSide netHandler) {
 		netHandler.handleUpdateLargeSign(this);
 	}
 
@@ -130,7 +129,7 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 		this.theString[0] = this.mainNBTTC.getString("largeSignText");
 		if(this.mainNBTTC.hasKey("itemStack"))
 			this.itemStack=ItemStack.loadItemStackFromNBT(this.mainNBTTC.getCompoundTag("itemStack"));
-		
+
 	}
 
 	@Override
@@ -140,7 +139,8 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 
 	@Override
 	public void processPacket(INetHandler netHandler) {
-		this.handleServerSide((NetHandlerPlayServerSide)netHandler);
+		this.handleClientSide((NetHandlerPlayClientSide)netHandler);
+		
 	}
 
 }

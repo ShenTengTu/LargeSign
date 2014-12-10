@@ -27,8 +27,9 @@ import net.minecraft.world.World;
 import org.apache.commons.lang3.text.StrBuilder;
 import org.lwjgl.opengl.GL11;
 
+import com.roripantsu.common.BasePath;
+import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.gui.CustomGuiTextAndFontStyleEditor;
-import com.roripantsu.largesign.texture.ETextureResource;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -112,7 +113,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 
 	private ResourceLocation completeResourceLocation(ResourceLocation location)
     {
-        return new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {ETextureResource.BasePath.Entity , location.getResourcePath(), ".png"}));
+        return new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {BasePath.Entity , location.getResourcePath(), ".png"}));
     }
 
 	private String formatStringClear(String str) {

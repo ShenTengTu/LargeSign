@@ -7,14 +7,13 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 
-import com.roripantsu.largesign.References;
+import com.roripantsu.common.network.PacketPipeline;
 import com.roripantsu.largesign.blocks.Block_LargeSign;
 import com.roripantsu.largesign.items.ItemBlock_LargeSign;
-import com.roripantsu.largesign.network.CPacketUpdateLargeSign;
-import com.roripantsu.largesign.network.CustomPacketEventListener;
-import com.roripantsu.largesign.network.PacketPipeline;
-import com.roripantsu.largesign.network.SPacketLargeSignEditorOpen;
-import com.roripantsu.largesign.network.SPacketUpdateLargeSign;
+import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
+import com.roripantsu.largesign.packet.CustomPacketEventListener;
+import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
+import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
@@ -30,16 +29,13 @@ import cpw.mods.fml.common.registry.GameRegistry;
 public class ProxyCommon {
 	
 	public Block block_LargeSign;
-	public final int channelKey=0;
 	public List<ItemStack> itemList;
 	public PacketPipeline packetPipeline;
 	
 	public void init(FMLInitializationEvent e) {
 		
 		packetPipeline=new PacketPipeline();
-		packetPipeline.addNewChannel(channelKey, References.MODID);
-		packetPipeline.registeEventListener(new CustomPacketEventListener(
-				channelKey, packetPipeline.getPacketsList()));
+		packetPipeline.registeEventListener(new CustomPacketEventListener(packetPipeline.getPacketsList()));
 		packetPipeline.registerPacket(SPacketUpdateLargeSign.class);
 		packetPipeline.registerPacket(SPacketLargeSignEditorOpen.class);
 		packetPipeline.registerPacket(CPacketUpdateLargeSign.class);

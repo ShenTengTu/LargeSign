@@ -22,8 +22,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
 import com.google.common.collect.Maps;
+import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.CustomGuiButton;
-import com.roripantsu.guilib.GuiI18n;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.guilib.GuiSubScreen;
 
@@ -61,8 +61,8 @@ public class CustomGuiIconList extends GuiSubScreen {
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
-	private String prev=GuiI18n.localize(guiName, "prev", new Object[0]);
-	private String next=GuiI18n.localize(guiName, "next", new Object[0]);
+	private String prev=ModI18n.gui(guiName, "prev", new Object[0]);
+	private String next=ModI18n.gui(guiName, "next", new Object[0]);
 	//<--Localize Gui
 	
 

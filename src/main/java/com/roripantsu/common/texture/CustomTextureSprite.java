@@ -1,4 +1,4 @@
-package com.roripantsu.largesign.texture;
+package com.roripantsu.common.texture;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -35,19 +35,36 @@ public class CustomTextureSprite extends TextureAtlasSprite {
 	int anisotropicFiltering=Minecraft.getMinecraft().gameSettings.anisotropicFiltering;
 	int mipmapLevels=Minecraft.getMinecraft().gameSettings.mipmapLevels;
 	private final String basePath;
+	private boolean isSpecifiedRegion;
 	
-	public CustomTextureSprite(int originX,int originY,String basePath,String iconName) {
+	/**
+	 * normal
+	 */
+	public CustomTextureSprite(String basePath,String iconName) {
+		super(iconName);
+		this.basePath=basePath;
+		this.originX=0;
+		this.originY=0;
+		this.isSpecifiedRegion=false;
+	}
+	
+	/**
+	 * Specified rectangular region width*height start from (originX,originY).
+	 */
+	public CustomTextureSprite(int originX,int originY,int width,int height,String basePath,String iconName) {
 		super(iconName);
 		this.basePath=basePath;
 		this.originX=originX;
 		this.originY=originY;
-		this.width=16;
-		this.height=16;
+		this.width=width;
+		this.height=height;
+		this.isSpecifiedRegion=true;
 	}
+	
+	
 
 	@Override
-	public boolean hasCustomLoader(IResourceManager manager,
-			ResourceLocation location) {
+	public boolean hasCustomLoader(IResourceManager manager,ResourceLocation location) {
 		return true;
 	}
 
@@ -58,21 +75,23 @@ public class CustomTextureSprite extends TextureAtlasSprite {
         	ResourceLocation locationNormal=this.completeResourceLocation(location,0);
         	IResource iresource = manager.getResource(locationNormal);
             BufferedImage[] abufferedimage = new BufferedImage[1 + this.mipmapLevels];
-            //load image with specified rectangular region
-            abufferedimage[0] = ImageIO.read(iresource.getInputStream()).getSubimage(originX, originY, 16, 16);
+            if(isSpecifiedRegion)
+            	abufferedimage[0] = ImageIO.read(iresource.getInputStream()).getSubimage(originX, originY, width, height);
+            else
+            	abufferedimage[0] = ImageIO.read(iresource.getInputStream());
+            	
             TextureMetadataSection texturemetadatasection = (TextureMetadataSection)iresource.getMetadata("texture");
 
             if (texturemetadatasection != null)
             {
                 List<?> list = texturemetadatasection.getListMipmaps();
-                int l;
 
                 if (!list.isEmpty())
                 {
-                    int k = abufferedimage[0].getWidth();
-                    l = abufferedimage[0].getHeight();
+                    int w = abufferedimage[0].getWidth();
+                    int h = abufferedimage[0].getHeight();
 
-                    if (MathHelper.roundUpToPowerOfTwo(k) != k || MathHelper.roundUpToPowerOfTwo(l) != l)
+                    if (MathHelper.roundUpToPowerOfTwo(w) != w || MathHelper.roundUpToPowerOfTwo(h) != h)
                     {
                         throw new RuntimeException("Unable to load extra miplevels, source-texture is not power of two");
                     }
@@ -82,19 +101,22 @@ public class CustomTextureSprite extends TextureAtlasSprite {
 
                 while (iterator3.hasNext())
                 {
-                    l = ((Integer)iterator3.next()).intValue();
+                    int index = ((Integer)iterator3.next()).intValue();
 
-                    if (l > 0 && l < abufferedimage.length - 1 && abufferedimage[l] == null)
+                    if (index > 0 && index < abufferedimage.length - 1 && abufferedimage[index] == null)
                     {
-                        ResourceLocation locationNormalMipmaps = this.completeResourceLocation(location, l);
+                        ResourceLocation locationNormalMipmaps = this.completeResourceLocation(location, index);
 
                         try
                         {
-                            abufferedimage[l] = ImageIO.read(manager.getResource(locationNormalMipmaps).getInputStream());
+                        	if(isSpecifiedRegion)
+                        		abufferedimage[index] = ImageIO.read(manager.getResource(locationNormalMipmaps).getInputStream()).getSubimage(originX, originY, this.width, this.height);
+                        	else
+                        		abufferedimage[index] = ImageIO.read(manager.getResource(locationNormalMipmaps).getInputStream());
                         }
                         catch (IOException ioexception)
                         {
-                            logger.error("Unable to load miplevel {} from: {}", new Object[] {Integer.valueOf(l), locationNormalMipmaps, ioexception});
+                            logger.error("Unable to load miplevel {} from: {}", new Object[] {Integer.valueOf(index), locationNormalMipmaps, ioexception});
                         }
                     }
                 }
@@ -115,9 +137,15 @@ public class CustomTextureSprite extends TextureAtlasSprite {
 	}
 	
 	
+	/**
+	 * 
+	 * @param location ResourceLocation which has registered.
+	 * @param num = <=0 is normal, >0 is mipmaps
+	 * @return complete resource path
+	 */
     private ResourceLocation completeResourceLocation(ResourceLocation location, int num)
     {
-        return num==0 ? new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {this.basePath , location.getResourcePath(), ".png"})): new ResourceLocation(location.getResourceDomain(), String.format("%s/mipmaps/%s.%d%s", new Object[] { this.basePath , location.getResourcePath(), Integer.valueOf(num), ".png"}));
+        return num <=0 ? new ResourceLocation(location.getResourceDomain(), String.format("%s/%s%s", new Object[] {this.basePath , location.getResourcePath(), ".png"})): new ResourceLocation(location.getResourceDomain(), String.format("%s/mipmaps/%s_%d%s", new Object[] { this.basePath , location.getResourcePath(), Integer.valueOf(num), ".png"}));
     }
 	
 }

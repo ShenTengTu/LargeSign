@@ -24,9 +24,10 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 
+import com.roripantsu.common.BasePath;
+import com.roripantsu.common.texture.CustomTextureSprite;
+import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.Mod_LargeSign;
-import com.roripantsu.largesign.texture.CustomTextureSprite;
-import com.roripantsu.largesign.texture.ETextureResource;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import cpw.mods.fml.relauncher.Side;
@@ -181,9 +182,7 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 		 for (int i = 0; i < subIcons.length;i++){
 		//load the specified resource to be block icon and register it.
 		CustomTextureSprite textureSprite=
-				new CustomTextureSprite(2,2,
-						ETextureResource.BasePath.Entity,
-						textureNames[i]);
+				new CustomTextureSprite(2,2,16,16,BasePath.Entity,textureNames[i]);
 		((TextureMap)iconRegister).setTextureEntry(textureNames[i], textureSprite);
 		subIcons[i]=textureSprite;
 		 }

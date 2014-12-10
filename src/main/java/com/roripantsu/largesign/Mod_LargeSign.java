@@ -3,6 +3,7 @@ package com.roripantsu.largesign;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 
+import com.roripantsu.common.ModInfo;
 import com.roripantsu.largesign.blocks.Block_LargeSign;
 import com.roripantsu.largesign.proxy.ProxyCommon;
 
@@ -19,10 +20,10 @@ import cpw.mods.fml.common.registry.GameRegistry;
  *Minecraft Mod - Large Sign
  *@author ShenTeng Tu(RoriPantsu)
  */
-@Mod(modid = References.MODID, name = References.NAME, version = References.VERSION, useMetadata = true)
+@Mod(modid = ModInfo.MODID, name = ModInfo.NAME, version = ModInfo.VERSION, useMetadata = true)
 public class Mod_LargeSign {
 	
-	@Instance(value = References.MODID)
+	@Instance(value = ModInfo.MODID)
 	public static Mod_LargeSign instance;
 
 	@SidedProxy(clientSide = "com.roripantsu.largesign.proxy.ProxyClient", serverSide = "com.roripantsu.largesign.proxy.ProxyServer")
@@ -34,7 +35,7 @@ public class Mod_LargeSign {
 		tab_modRoriPantsu=new CreativeTabs("tab_modRoriPantsu") {
 			@Override
 			public Item getTabIconItem() {
-				return GameRegistry.findItem(References.MODID,
+				return GameRegistry.findItem(ModInfo.MODID,
 						Block_LargeSign.class.getSimpleName());
 			}
 		};

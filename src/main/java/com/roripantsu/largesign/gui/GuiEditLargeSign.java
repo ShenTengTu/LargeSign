@@ -12,11 +12,11 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
-import com.roripantsu.guilib.GuiI18n;
+import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.largesign.Mod_LargeSign;
-import com.roripantsu.largesign.network.CPacketUpdateLargeSign;
-import com.roripantsu.largesign.network.SPacketUpdateLargeSign;
+import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
+import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSignRenderer;
 
@@ -45,9 +45,9 @@ public class GuiEditLargeSign extends GuiMainScreen {
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
-	private String textMode=GuiI18n.localize(guiName, "textMode", new Object[0]);
-	private String itemIconMode=GuiI18n.localize(guiName, "itemIconMode", new Object[0]);
-	private String done=GuiI18n.localize(guiName, "done", new Object[0]);
+	private String textMode=ModI18n.gui(guiName, "textMode", new Object[0]);
+	private String itemIconMode=ModI18n.gui(guiName, "itemIconMode", new Object[0]);
+	private String done=ModI18n.gui(guiName, "done", new Object[0]);
 	//<--Localize Gui
 	
 	public GuiEditLargeSign(TileEntityLargeSign tileEntity) {
@@ -195,10 +195,8 @@ public class GuiEditLargeSign extends GuiMainScreen {
 
 		try {
 			List<Object> list = new LinkedList<Object>();
-			Mod_LargeSign.proxy.packetPipeline.encode(thePacketC,
-					Mod_LargeSign.proxy.channelKey, list);
-			Mod_LargeSign.proxy.packetPipeline.encode(thePacketS,
-					Mod_LargeSign.proxy.channelKey, list);
+			Mod_LargeSign.proxy.packetPipeline.encode(thePacketC, list);
+			Mod_LargeSign.proxy.packetPipeline.encode(thePacketS, list);
 			FMLProxyPacket pktC = (FMLProxyPacket) list.get(0);
 			FMLProxyPacket pktS = (FMLProxyPacket) list.get(1);
 			Mod_LargeSign.proxy.packetPipeline.sendToServer(pktC);

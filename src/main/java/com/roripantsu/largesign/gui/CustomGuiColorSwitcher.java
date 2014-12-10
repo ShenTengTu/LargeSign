@@ -10,8 +10,8 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
 
+import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.CustomGuiButton;
-import com.roripantsu.guilib.GuiI18n;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.guilib.GuiSubScreen;
 
@@ -49,7 +49,7 @@ public class CustomGuiColorSwitcher extends GuiSubScreen {
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
-	private String title=GuiI18n.localize(guiName, "title", new Object[0]);
+	private String title=ModI18n.gui(guiName, "title", new Object[0]);
 	//<--Localize Gui
 
 	public CustomGuiColorSwitcher(int ID,Minecraft MC,FontRenderer font,GuiMainScreen parent,

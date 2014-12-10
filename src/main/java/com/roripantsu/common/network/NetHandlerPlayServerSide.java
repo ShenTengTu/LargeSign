@@ -1,4 +1,4 @@
-package com.roripantsu.largesign.network;
+package com.roripantsu.common.network;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -8,7 +8,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.world.WorldServer;
 
-import com.roripantsu.largesign.Mod_LargeSign;
+import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 /**
@@ -16,7 +16,6 @@ import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
  *@author ShenTeng Tu(RoriPantsu)
  */
 public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
-	private PacketPipeline pipeline;
 	private EntityPlayerMP playerEntity;
 	private MinecraftServer serverController;
 
@@ -25,16 +24,15 @@ public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
 		super(serverController, networkManager, playerEntity);
 		this.serverController = serverController;
 		this.playerEntity = playerEntity;
-		this.pipeline = Mod_LargeSign.proxy.packetPipeline;
 
-	}
-
-	public PacketPipeline getPipeline() {
-		return pipeline;
 	}
 
 	public EntityPlayerMP getPlayerEntity() {
-		return this.playerEntity;
+		return playerEntity;
+	}
+
+	public MinecraftServer getServerController() {
+		return serverController;
 	}
 
 	public void handleUpdateLargeSign(CPacketUpdateLargeSign thePacket) {

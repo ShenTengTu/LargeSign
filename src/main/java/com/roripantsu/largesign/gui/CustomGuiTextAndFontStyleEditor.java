@@ -7,7 +7,7 @@ import net.minecraft.client.gui.GuiTextField;
 
 import org.apache.commons.lang3.text.StrBuilder;
 
-import com.roripantsu.guilib.GuiI18n;
+import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.guilib.GuiSubScreen;
 
@@ -61,11 +61,11 @@ public class CustomGuiTextAndFontStyleEditor extends GuiSubScreen {
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
-	private String title=GuiI18n.localize(guiName, "title", new Object[0]);
-	private String editMsg=GuiI18n.localize(guiName, "editMsg", new Object[0]);
-	private String shadow=GuiI18n.localize(guiName, "shadow", new Object[0]);
-	private String reset=GuiI18n.localize(guiName, "reset", new Object[0]);
-	private String resetAll=GuiI18n.localize(guiName, "resetAll", new Object[0]);
+	private String title=ModI18n.gui(guiName, "title", new Object[0]);
+	private String editMsg=ModI18n.gui(guiName, "editMsg", new Object[0]);
+	private String shadow=ModI18n.gui(guiName, "shadow", new Object[0]);
+	private String reset=ModI18n.gui(guiName, "reset", new Object[0]);
+	private String resetAll=ModI18n.gui(guiName, "resetAll", new Object[0]);
 	//<--Localize Gui
 
 

@@ -1,4 +1,4 @@
-package com.roripantsu.largesign.network;
+package com.roripantsu.common.network;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -8,8 +8,9 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ChatComponentText;
 
-import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.gui.GuiEditLargeSign;
+import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
+import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import cpw.mods.fml.relauncher.Side;
@@ -25,7 +26,6 @@ public class NetHandlerPlayClientSide extends NetHandlerPlayClient {
 	private WorldClient clientWorldController;
 	private Minecraft gameController;
 	private GuiScreen guiScreenServer;
-	private PacketPipeline pipeline = Mod_LargeSign.proxy.packetPipeline;
 
 	public NetHandlerPlayClientSide(Minecraft gameController,
 			GuiScreen guiScreenServer, NetworkManager networkManager) {
@@ -35,12 +35,16 @@ public class NetHandlerPlayClientSide extends NetHandlerPlayClient {
 		this.clientWorldController = this.gameController.theWorld;
 	}
 
-	public GuiScreen getGuiScreenServer() {
-		return guiScreenServer;
+	public WorldClient getClientWorldController() {
+		return clientWorldController;
 	}
 
-	public PacketPipeline getPipeline() {
-		return pipeline;
+	public Minecraft getGameController() {
+		return gameController;
+	}
+
+	public GuiScreen getGuiScreenServer() {
+		return guiScreenServer;
 	}
 
 	public void handleLargeSignEditorOpen(SPacketLargeSignEditorOpen thePacket) {

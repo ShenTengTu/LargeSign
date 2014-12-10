@@ -4,8 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 
+import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.CustomGuiSlider;
-import com.roripantsu.guilib.GuiI18n;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.guilib.GuiSubScreen;
 
@@ -28,11 +28,11 @@ public class CustomGuiPositonAndScaleAdjustor extends GuiSubScreen {
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
-	private String title=GuiI18n.localize(guiName, "title", new Object[0]);
-	private String xPos=GuiI18n.localize(guiName, "xPos", new Object[0]);
-	private String yPos=GuiI18n.localize(guiName, "yPos", new Object[0]);
-	private String scale=GuiI18n.localize(guiName, "scale", new Object[0]);
-	private String reset=GuiI18n.localize(guiName, "reset", new Object[0]);
+	private String title=ModI18n.gui(guiName, "title", new Object[0]);
+	private String xPos=ModI18n.gui(guiName, "xPos", new Object[0]);
+	private String yPos=ModI18n.gui(guiName, "yPos", new Object[0]);
+	private String scale=ModI18n.gui(guiName, "scale", new Object[0]);
+	private String reset=ModI18n.gui(guiName, "reset", new Object[0]);
 	//<--Localize Gui
 	
 	public CustomGuiPositonAndScaleAdjustor(int ID,Minecraft MC,FontRenderer font,GuiMainScreen parent,

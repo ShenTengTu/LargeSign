@@ -1,4 +1,4 @@
-package com.roripantsu.largesign.network;
+package com.roripantsu.common.network;
 
 import net.minecraft.network.Packet;
 
