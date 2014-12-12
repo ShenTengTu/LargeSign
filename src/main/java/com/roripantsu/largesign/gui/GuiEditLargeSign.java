@@ -62,12 +62,17 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		this.drawLargeSign();
 		this.drawHorizontalLine(0, this.width, this.height / 32 * 4+4, new Color(
 				255, 255, 255, 128).getRGB());
+		
 		this.fontStyleChooser.drawScreen(mouseX, mouseY, par3);
 		this.Adjuter.drawScreen(mouseX, mouseY, par3);
 		this.colorChooser.drawScreen(mouseX, mouseY, par3);
 		this.iconList.drawScreen(mouseX, mouseY, par3);
+		if(this.modeNumber==1 && this.iconList.selectedItemStack != null)
+			this.drawCenteredString(fontRendererObj,
+					this.iconList.selectedItemStack.getDisplayName(), 
+					this.width/2, this.gridHeight*50, 16777215);
 		super.drawScreen(mouseX, mouseY, par3);//draw all GuiButton and GuiLabel
-		this.iconList.renderButtonHoveringText(mouseX, mouseY);		
+		this.iconList.renderButtonHoveringText(mouseX, mouseY);
 	}
 
 	@Override
