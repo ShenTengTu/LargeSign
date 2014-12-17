@@ -306,4 +306,18 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 	        }
         }
     }
+    
+    @Override
+    public void onBlockClicked(World world, int x, int y, int z, EntityPlayer entityPlayer) {
+    	//for Large Sign Rotation.
+    	if(entityPlayer.isSneaking()){
+    		TileEntityLargeSign tileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);
+    		if(tileEntity!=null){
+    				tileEntity.rotate+=45F;
+    				if(tileEntity.rotate==360F)
+    					tileEntity.rotate=0;
+    		}
+    	}
+    	
+    }
 }

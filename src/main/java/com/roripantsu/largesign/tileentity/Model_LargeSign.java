@@ -27,8 +27,8 @@ public class Model_LargeSign extends ModelBase {
 
 	public void renderLargeSign(Entity entity, float f, float f1, float f2,
 			float f3, float f4, float scale) {
-		super.render(entity, f, f1, f2, f3, f4, scale);
-		setRotationAngles(f, f1, f2, f3, f4, scale, entity);
+		//super.render(entity, f, f1, f2, f3, f4, scale);
+		//setRotationAngles(f, f1, f2, f3, f4, scale, entity);
 		LargeSign.render(scale);
 	}
 
