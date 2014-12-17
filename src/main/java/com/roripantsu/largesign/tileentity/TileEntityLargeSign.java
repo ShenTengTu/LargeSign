@@ -26,6 +26,7 @@ public class TileEntityLargeSign extends TileEntity {
 	public float scaleAdjust = 0F;
 	public float XAdjust = 0F;
 	public float YAdjust = 0F;
+	public float rotate = 0F;
 	private boolean Editable = true;
 	private EntityPlayer entityPlayer;
 	private NBTTagCompound NBTTC = new NBTTagCompound();
@@ -90,6 +91,7 @@ public class TileEntityLargeSign extends TileEntity {
 		this.largeSignText[0] = NBTTC.getString("largeSignText");
 		this.XAdjust = NBTTC.getFloat("XAdjust");
 		this.YAdjust = NBTTC.getFloat("YAdjust");
+		this.rotate = NBTTC.getFloat("rotate");
 		this.scaleAdjust = NBTTC.getFloat("scaleAdjust");
 		this.side=NBTTC.getInteger("side");
 		if(NBTTC.hasKey("itemStack"))
@@ -131,6 +133,7 @@ public class TileEntityLargeSign extends TileEntity {
 		NBTTC.setFloat("XAdjust", this.XAdjust);
 		NBTTC.setFloat("YAdjust", this.YAdjust);
 		NBTTC.setFloat("scaleAdjust", this.scaleAdjust);
+		NBTTC.setFloat("rotate", this.rotate);
 		NBTTC.setString("largeSignText", this.largeSignText[0]);
 		NBTTC.setInteger("side",this.side);
 		if(this.itemStack!=null)

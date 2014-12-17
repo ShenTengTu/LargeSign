@@ -75,6 +75,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 		int modeNumber = tileEntityLargeSign.modeNumber;
 		int side = MC.theWorld.getBlockMetadata(tileEntityLargeSign.xCoord,
 				tileEntityLargeSign.yCoord, tileEntityLargeSign.zCoord);
+		float modelRotate = tileEntityLargeSign.rotate;
 		
 		GL11.glPushMatrix();
 		float rotateAngle = 0.0F;
@@ -94,7 +95,13 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 		this.bindTexture(this.completeResourceLocation(textureLocation[i]));
 		
 		GL11.glPushMatrix();
-		GL11.glScalef(1F, -0.875F, -0.5F);
+		float f1=1F;
+		float f2=(float) (1/Math.sqrt(2));
+		float f3=0.875F;
+		float[] xScale8Dir={f1,f2,f3,f2,f1,f2,f3,f2};
+		float[] yScale8Dir={-f3,-f2,-f1,-f2,-f3,-f2,-f1,-f2};
+		GL11.glScalef( xScale8Dir[(int) (modelRotate/45F)], yScale8Dir[(int) (modelRotate/45F)], -0.5F);
+		this.modelLargeSign.setRotation(this.modelLargeSign.LargeSign, 0F, 0F, modelRotate/180F*(float)Math.PI);
 		this.modelLargeSign.renderLargeSign((Entity) null, 0.0F, 0.0F, 0.0F,
 				0.0F, 0.0F, 1 / 16F);
 		GL11.glPopMatrix();
