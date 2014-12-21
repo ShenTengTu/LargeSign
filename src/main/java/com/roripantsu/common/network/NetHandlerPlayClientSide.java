@@ -13,8 +13,8 @@ import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
 import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *handle opening Large Sign editor and updating Large Sign at client side

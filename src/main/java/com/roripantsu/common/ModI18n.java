@@ -1,8 +1,8 @@
 package com.roripantsu.common;
 
 import net.minecraft.client.resources.I18n;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *For Mod localization.

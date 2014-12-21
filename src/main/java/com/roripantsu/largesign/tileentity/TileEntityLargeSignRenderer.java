@@ -32,8 +32,8 @@ import com.roripantsu.common.BasePath;
 import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.gui.CustomGuiTextAndFontStyleEditor;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Tile entity special renderer of Large Sign

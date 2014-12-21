@@ -30,8 +30,8 @@ import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Block class of Large Sign,some methods content same as BlockSign.

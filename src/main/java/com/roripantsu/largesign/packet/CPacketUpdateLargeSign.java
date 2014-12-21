@@ -11,8 +11,8 @@ import com.roripantsu.common.network.ClientPacket;
 import com.roripantsu.common.network.NetHandlerPlayServerSide;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *the packet which handle Updating Large Sign for client
