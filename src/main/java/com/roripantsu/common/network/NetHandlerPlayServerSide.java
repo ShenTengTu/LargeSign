@@ -5,6 +5,7 @@ import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.world.WorldServer;
 
@@ -36,22 +37,26 @@ public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
 	}
 
 	public void handleUpdateLargeSign(CPacketUpdateLargeSign thePacket) {
-		this.playerEntity.func_143004_u();
+		this.playerEntity.markPlayerActive();
 		WorldServer worldserver = this.serverController
 				.worldServerForDimension(this.playerEntity.dimension);
 		int x=thePacket.getXCoordinate();
 		int y=thePacket.getYCoordinate();
 		int z=thePacket.getZCoordinate();
 		
-		if (worldserver.blockExists(x,y,z)) {
-			TileEntity tileentity = worldserver.getTileEntity(x,y,z);
+		//1.7.10 World.blockExists(int,int,int)
+		boolean isBlockExist = y >= 0 && y < 256 ? worldserver.chunkExists(x >> 4, z >> 4) : false;
+		//end
+		
+		if (isBlockExist) {
+			TileEntity tileentity = worldserver.getTileEntity(new BlockPos(x,y,z));
 			if (tileentity instanceof TileEntityLargeSign) {
 				TileEntityLargeSign tileEntityLargeSign = (TileEntityLargeSign) tileentity;
 
 				if (!tileEntityLargeSign.isEditable()
 						|| tileEntityLargeSign.getEntityPlayer() != this.playerEntity) {
 					this.serverController.logWarning("Player "
-							+ this.playerEntity.getCommandSenderName()
+							+ this.playerEntity.getName()
 							+ " just tried to change non-editable sign");
 					return;
 				}
@@ -76,7 +81,7 @@ public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
 
 				tileEntityLargeSign.readFromNBT(thePacket.getMainNBTTC());
 				tileEntityLargeSign.markDirty();
-				worldserver.markBlockForUpdate(x,y,z);
+				worldserver.markBlockForUpdate(new BlockPos(x,y,z));
 				
 			}
 		}

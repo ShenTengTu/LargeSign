@@ -15,17 +15,16 @@ import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.roripantsu.common.ModInfo;
-
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.roripantsu.largesign.Mod_LargeSign;
 
 /**
  *Controling communication for client and server
@@ -34,13 +33,14 @@ import net.minecraftforge.fml.relauncher.Side;
 @Sharable
 public class PacketPipeline {
 
+	private static Minecraft MC=Minecraft.getMinecraft();
 	private static final Logger logger = LogManager.getLogger();
 	private FMLEventChannel channel;
 	private boolean isPostInitialised = false;
 	private List<Class<? extends Packet>> packetsList = new ArrayList<Class<? extends Packet>>();
 
 	public PacketPipeline() {
-		this.channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(ModInfo.MODID);
+		this.channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(Mod_LargeSign.MODID);
 	}
 
 	public void decode(FMLProxyPacket proxyPacket,List<Object> out) throws Exception {
@@ -61,13 +61,14 @@ public class PacketPipeline {
 		switch (FMLCommonHandler.instance().getEffectiveSide()) {
 		case CLIENT:
 			NetHandlerPlayClientSide NHPCS = new NetHandlerPlayClientSide(
-					Minecraft.getMinecraft(), Minecraft.getMinecraft().currentScreen,
-					Minecraft.getMinecraft().getNetHandler().getNetworkManager());
+					MC, MC.currentScreen,
+					MC.getNetHandler().getNetworkManager(),
+					MC.getSession().getProfile());
 			thePacket.processPacket(NHPCS);
 			break;
 		case SERVER:
 			NetHandlerPlayServer netHandler = (NetHandlerPlayServer) NetworkRegistry.INSTANCE
-					.getChannel(ModInfo.MODID, Side.SERVER)
+					.getChannel(Mod_LargeSign.MODID, Side.SERVER)
 					.attr(NetworkRegistry.NET_HANDLER).get();
 			NetHandlerPlayServerSide NHPSS = new NetHandlerPlayServerSide(
 					MinecraftServer.getServer(), netHandler.playerEntity,
@@ -91,7 +92,7 @@ public class PacketPipeline {
 		byte discriminator = (byte) this.packetsList.indexOf(theClass);
 		packetBuffer.writeByte(discriminator);
 		thePacket.writePacketData(packetBuffer);
-		FMLProxyPacket proxyPacket = new FMLProxyPacket(packetBuffer.copy(),ModInfo.MODID);
+		FMLProxyPacket proxyPacket = new FMLProxyPacket((PacketBuffer) packetBuffer.copy(),Mod_LargeSign.MODID);
 		out.add(proxyPacket);
 	}
 	
