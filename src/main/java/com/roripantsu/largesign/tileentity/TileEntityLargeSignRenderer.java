@@ -5,6 +5,7 @@ import java.util.List;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -21,6 +22,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -62,22 +64,21 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 	
 	@Override
 	public void renderTileEntityAt(TileEntity tileEntity, double render_xCoord,
-			double render_yCoord, double render_zCoord, float FL) {
+			double render_yCoord, double render_zCoord, float FL,int destoryStage) {
 		this.renderLargeSign((TileEntityLargeSign) tileEntity, render_xCoord,
-				render_yCoord, render_zCoord, FL);
+				render_yCoord, render_zCoord, FL, destoryStage);
 
 	}
 
 	void renderLargeSign(TileEntityLargeSign tileEntityLargeSign,
 			double render_xCoord, double render_yCoord, double render_zCoord,
-			float FL) {
+			float FL,int destoryStage) {
 
 		int modeNumber = tileEntityLargeSign.modeNumber;
-		int side = MC.theWorld.getBlockMetadata(tileEntityLargeSign.xCoord,
-				tileEntityLargeSign.yCoord, tileEntityLargeSign.zCoord);
+		int side = tileEntityLargeSign.getBlockMetadata();
 		float modelRotate = tileEntityLargeSign.rotate;
 		
-		GL11.glPushMatrix();
+		GL11.glPushMatrix();//1.8 GlStateManager.pushMatrix();
 		float rotateAngle = 0.0F;
 		if (side == 2)
 			rotateAngle = 180.0F;
@@ -85,15 +86,29 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 			rotateAngle = 90.0F;
 		if (side == 5)
 			rotateAngle = -90.0F;
-
+		
+		//1.8 GlStateManager.translate(float, float, float)
+		//1.8 GlStateManager.rotate(float, float, float, float)
 		GL11.glTranslatef((float) render_xCoord + 0.5F,
 				(float) render_yCoord + 0.5F, (float) render_zCoord + 0.5F);
 		GL11.glRotatef(-rotateAngle, 0.0F, 1.0F, 0.0F);
 		
-		//for Sub Block or Item
-		int i = MathHelper.clamp_int(tileEntityLargeSign.getTheMetadata(), 0, textureLocation.length-1);
-		this.bindTexture(this.completeResourceLocation(textureLocation[i]));
 		
+		
+        if (destoryStage >= 0){
+        	this.bindTexture(DESTROY_STAGES[destoryStage]);
+            GlStateManager.matrixMode(5890);
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(4.0F, 2.0F, 1.0F);
+            GlStateManager.translate(0.0625F, 0.0625F, 0.0625F);
+            GlStateManager.matrixMode(5888);
+        }else{
+		//for Sub Block or Item
+        	int i = MathHelper.clamp_int(tileEntityLargeSign.getTheMetadata(), 0, textureLocation.length-1);
+        	this.bindTexture(this.completeResourceLocation(textureLocation[i]));
+        }
+		
+        GlStateManager.enableRescaleNormal();
 		GL11.glPushMatrix();
 		float f1=1F;
 		float f2=(float) (1/Math.sqrt(2));
@@ -114,8 +129,14 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 			this.renderItemIcon(tileEntityLargeSign);
 			break;
 		}
-
 		GL11.glPopMatrix();
+		
+        if (destoryStage >= 0)
+        {
+            GlStateManager.matrixMode(5890);
+            GlStateManager.popMatrix();
+            GlStateManager.matrixMode(5888);
+        }
 
 	}
 
@@ -144,10 +165,11 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 
 	private void renderItemIcon(TileEntityLargeSign tileEntity) {
 		
-		World world=tileEntity.getWorldObj();
-		int x=tileEntity.xCoord;
-		int y=tileEntity.yCoord;
-		int z=tileEntity.zCoord;
+		World world=tileEntity.getWorld();
+		int x=tileEntity.getPos().getX();
+		int y=tileEntity.getPos().getY();
+		int z=tileEntity.getPos().getZ();
+		
 		int direction=Direction.facingToDirection[tileEntity.getSide()];
 		ItemStack itemStack = tileEntity.getItemStack();
 		
@@ -261,7 +283,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 				(scaleParam + adjust[0]) / 1000F);
 		GL11.glNormal3f(0.0F, 0.0F, -1.75F * (scaleParam + adjust[0]) / 1000F);// luminance
 		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glEnable(GL11.GL_BLEND);//?
 		
 		if(multipleLine){
 			List<String> list=this.fontrenderer.listFormattedStringToWidth(str, 80);
@@ -281,7 +303,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 
 		GL11.glDepthMask(true);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-
+		
 	}
 }
 

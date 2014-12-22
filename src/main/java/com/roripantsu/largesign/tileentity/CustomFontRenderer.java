@@ -8,18 +8,19 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+import org.apache.commons.io.IOUtils;
 import org.lwjgl.opengl.GL11;
 
 import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.ArabicShapingException;
 import com.ibm.icu.text.Bidi;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Extends FontRenderer,Some methods' parameters change type "int" to "float".
@@ -49,15 +50,15 @@ public class CustomFontRenderer extends FontRenderer {
 	private boolean underlineStyle;
 	private boolean unicodeFlag;
 
-	public CustomFontRenderer(GameSettings par1GameSettings,
-			ResourceLocation par2ResourceLocation,
-			TextureManager par3TextureManager, boolean unicode) {
-		super(par1GameSettings, par2ResourceLocation, par3TextureManager,
+	public CustomFontRenderer(GameSettings gameSettings,
+			ResourceLocation resourceLocation,
+			TextureManager textureManager, boolean unicode) {
+		super(gameSettings, resourceLocation, textureManager,
 				unicode);
-		this.locationFontTexture = par2ResourceLocation;
-		this.renderEngine = par3TextureManager;
+		this.locationFontTexture = resourceLocation;
+		this.renderEngine = textureManager;
 		this.unicodeFlag = unicode;
-		par3TextureManager.bindTexture(this.locationFontTexture);
+		textureManager.bindTexture(this.locationFontTexture);
 
 		for (int i = 0; i < 32; ++i) {
 			int j = (i >> 3 & 1) * 85;
@@ -69,7 +70,7 @@ public class CustomFontRenderer extends FontRenderer {
 				k += 85;
 			}
 
-			if (par1GameSettings.anaglyph) {
+			if (gameSettings.anaglyph) {
 				int j1 = (k * 30 + l * 59 + i1 * 11) / 100;
 				int k1 = (k * 30 + l * 70) / 100;
 				int l1 = (k * 30 + i1 * 70) / 100;
@@ -90,73 +91,80 @@ public class CustomFontRenderer extends FontRenderer {
 		this.readGlyphSizes();
 	}
 
-	public void drawSplitString(String par1Str, float par2, float par3,
-			int par4, int par5) {
+    /**
+     * Splits and draws a String with wordwrap (maximum length is parameter k)
+     */
+	public void drawSplitString(String str, float x, float y,
+			int wrapWidth, int textColor) {
 		this.resetStyles();
-		this.textColor = par5;
-		par1Str = this.trimStringNewline(par1Str);
-		this.renderSplitString(par1Str, par2, par3, par4, false);
+		this.textColor = textColor;
+		str = this.trimStringNewline(str);
+		this.renderSplitString(str, x, y, wrapWidth, false);
 	}
 
-	public int drawString(String par1Str, float par2, float par3, int par4) {
-		return this.drawString(par1Str, par2, par3, par4, false);
+	public int drawString(String str, float x, float y, int textColor) {
+		return this.drawString(str, x, y, textColor, false);
 	}
 
-	public int drawString(String par1Str, float par2, float par3, int par4,
-			boolean par5) {
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
+	public int drawString(String str, float x, float y, int textColor,
+			boolean addShadow) {
+		GL11.glEnable(GL11.GL_ALPHA_TEST);//1.8 GlStateManager.enableAlpha();
 		this.resetStyles();
 		int l;
 
-		if (par5) {
-			l = this.renderString(par1Str, par2 + 1, par3 + 1, par4, true);
-			l = Math.max(l, this.renderString(par1Str, par2, par3, par4, false));
+		if (addShadow) {
+			l = this.renderString(str, x + 1, y + 1, textColor, true);
+			l = Math.max(l, this.renderString(str, x, y, textColor, false));
 		} else {
-			l = this.renderString(par1Str, par2, par3, par4, false);
+			l = this.renderString(str, x, y, textColor, false);
 		}
 
 		return l;
 	}
 
-	public int drawStringWithShadow(String par1Str, float par2, float par3,
-			int par4) {
-		return this.drawString(par1Str, par2, par3, par4, true);
+	public int drawStringWithShadow(String str, float x, float y,
+			int textColor) {
+		return this.drawString(str, x, y, textColor, true);
 	}
 
-	private String bidiReorder(String p_147647_1_) {
+	private String bidiReorder(String str) {
 		try {
-			Bidi bidi = new Bidi((new ArabicShaping(8)).shape(p_147647_1_), 127);
+			Bidi bidi = new Bidi((new ArabicShaping(8)).shape(str), 127);
 			bidi.setReorderingMode(0);
 			return bidi.writeReordered(2);
 		} catch (ArabicShapingException arabicshapingexception) {
-			return p_147647_1_;
+			return str;
 		}
 	}
 
-	private ResourceLocation getUnicodePageLocation(int par1) {
-		if (unicodePageLocations[par1] == null) {
-			unicodePageLocations[par1] = new ResourceLocation(String.format(
+	private ResourceLocation getUnicodePageLocation(int index) {
+		if (unicodePageLocations[index] == null) {
+			unicodePageLocations[index] = new ResourceLocation(String.format(
 					"textures/font/unicode_page_%02x.png",
-					new Object[] { Integer.valueOf(par1) }));
+					new Object[] { Integer.valueOf(index) }));
 		}
 
-		return unicodePageLocations[par1];
+		return unicodePageLocations[index];
 	}
 
-	private void loadGlyphTexture(int par1) {
-		this.renderEngine.bindTexture(this.getUnicodePageLocation(par1));
+	private void loadGlyphTexture(int index) {
+		this.renderEngine.bindTexture(this.getUnicodePageLocation(index));
 	}
 
 	private void readGlyphSizes() {
+		
+		InputStream inputstream = null;
 		try {
-			InputStream inputstream = Minecraft.getMinecraft()
+			inputstream = Minecraft.getMinecraft()
 					.getResourceManager()
 					.getResource(new ResourceLocation("font/glyph_sizes.bin"))
 					.getInputStream();
 			inputstream.read(this.glyphWidth);
 		} catch (IOException ioexception) {
 			throw new RuntimeException(ioexception);
-		}
+		}finally{
+            IOUtils.closeQuietly(inputstream);
+        }
 	}
 
 	private float renderCharAtPos(int par1, char par2, boolean par3) {
@@ -168,11 +176,11 @@ public class CustomFontRenderer extends FontRenderer {
 	}
 
 	private float renderDefaultChar(int par1, boolean par2) {
-		float f = par1 % 16 * 8;
-		float f1 = par1 / 16 * 8;
+		float f = (float)(par1 % 16 * 8);
+		float f1 = (float)(par1 / 16 * 8);
 		float f2 = par2 ? 1.0F : 0.0F;
 		this.renderEngine.bindTexture(this.locationFontTexture);
-		float f3 = this.charWidth[par1] - 0.01F;
+		float f3 = (float)this.charWidth[par1] - 0.01F;
 		GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 		GL11.glTexCoord2f(f / 128.0F, f1 / 128.0F);
 		GL11.glVertex3f(this.posX + f2, this.posY, 0.0F);
@@ -186,62 +194,63 @@ public class CustomFontRenderer extends FontRenderer {
 		return this.charWidth[par1];
 	}
 
-	private void renderSplitString(String par1Str, float par2, float par3,
-			int par4, boolean par5) {
-		List<?> list = this.listFormattedStringToWidth(par1Str, par4);
+	private void renderSplitString(String str, float x, float y,
+			int warpWidth, boolean addShadow) {
+		List<?> list = this.listFormattedStringToWidth(str, warpWidth);
 
-		for (Iterator<?> iterator = list.iterator(); iterator.hasNext(); par3 += this.FONT_HEIGHT) {
+		for (Iterator<?> iterator = list.iterator(); iterator.hasNext(); y += this.FONT_HEIGHT) {
 			String s1 = (String) iterator.next();
-			this.renderStringAligned(s1, par2, par3, par4, this.textColor, par5);
+			this.renderStringAligned(s1, x, y, warpWidth, this.textColor, addShadow);
 		}
 	}
 
-	private int renderString(String par1Str, float f, float g, int par4,
-			boolean par5) {
-		if (par1Str == null) {
+	private int renderString(String str, float x, float y, int textColor,
+			boolean addShadow) {
+		if (str == null) {
 			return 0;
 		} else {
 			if (this.bidiFlag) {
-				par1Str = this.bidiReorder(par1Str);
+				str = this.bidiReorder(str);
 			}
 
-			if ((par4 & -67108864) == 0) {
-				par4 |= -16777216;
+			if ((textColor & -67108864) == 0) {
+				textColor |= -16777216;
 			}
 
-			if (par5) {
-				par4 = (par4 & 16579836) >> 2 | par4 & -16777216;
+			if (addShadow) {
+				textColor = (textColor & 16579836) >> 2 | textColor & -16777216;
 			}
-			this.red = (par4 >> 16 & 255) / 255.0F;
-			this.blue = (par4 >> 8 & 255) / 255.0F;
-			this.green = (par4 & 255) / 255.0F;
-			this.alpha = (par4 >> 24 & 255) / 255.0F;
+			this.red = (float)(textColor >> 16 & 255) / 255.0F;
+			this.blue = (float)(textColor >> 8 & 255) / 255.0F;
+			this.green = (float)(textColor & 255) / 255.0F;
+			this.alpha = (float)(textColor >> 24 & 255) / 255.0F;
+			//1.8  GlStateManager.color(float, float, float, float);
 			GL11.glColor4f(this.red, this.blue, this.green, this.alpha);
-			this.posX = f;
-			this.posY = g;
-			this.renderStringAtPos(par1Str, par5);
+			this.posX = x;
+			this.posY = y;
+			this.renderStringAtPos(str, addShadow);
 			return (int) this.posX;
 		}
 	}
 
-	private int renderStringAligned(String par1Str, float par2, float par3,
-			int par4, int par5, boolean par6) {
+	private int renderStringAligned(String str, float x, float y,
+			int warpWidth, int textColor, boolean addShadow) {
 		if (this.bidiFlag) {
-			int i1 = this.getStringWidth(this.bidiReorder(par1Str));
-			par2 = par2 + par4 - i1;
+			int i1 = this.getStringWidth(this.bidiReorder(str));
+			x = x + warpWidth - i1;
 		}
 
-		return this.renderString(par1Str, par2, par3, par5, par6);
+		return this.renderString(str, x, y, textColor, addShadow);
 	}
 
-	private void renderStringAtPos(String par1Str, boolean par2) {
-		for (int i = 0; i < par1Str.length(); ++i) {
-			char c0 = par1Str.charAt(i);
+	private void renderStringAtPos(String str, boolean addShadow) {
+		for (int i = 0; i < str.length(); ++i) {
+			char c0 = str.charAt(i);
 			int j;
 			int k;
 
-			if (c0 == 167 && i + 1 < par1Str.length()) {
-				j = "0123456789abcdefklmnor".indexOf(par1Str.toLowerCase()
+			if (c0 == 167 && i + 1 < str.length()) {
+				j = "0123456789abcdefklmnor".indexOf(str.toLowerCase()
 						.charAt(i + 1));
 
 				if (j < 16) {
@@ -255,15 +264,16 @@ public class CustomFontRenderer extends FontRenderer {
 						j = 15;
 					}
 
-					if (par2) {
+					if (addShadow) {
 						j += 16;
 					}
 
 					k = this.colorCode[j];
 					this.textColor = k;
-					GL11.glColor4f((k >> 16) / 255.0F,
-							(k >> 8 & 255) / 255.0F,
-							(k & 255) / 255.0F, this.alpha);
+					//1.8  GlStateManager.color(float, float, float, float);
+					GL11.glColor4f((float)(k >> 16) / 255.0F,
+							(float)(k >> 8 & 255) / 255.0F,
+							(float)(k & 255) / 255.0F, this.alpha);
 				} else if (j == 16) {
 					this.randomStyle = true;
 				} else if (j == 17) {
@@ -280,6 +290,7 @@ public class CustomFontRenderer extends FontRenderer {
 					this.strikethroughStyle = false;
 					this.underlineStyle = false;
 					this.italicStyle = false;
+					//1.8  GlStateManager.color(float, float, float, float);
 					GL11.glColor4f(this.red, this.blue, this.green, this.alpha);
 				}
 
@@ -298,7 +309,7 @@ public class CustomFontRenderer extends FontRenderer {
 
 				float f1 = this.unicodeFlag ? 0.5F : 1.0F;
 				boolean flag1 = (c0 == 0 || j == -1 || this.unicodeFlag)
-						&& par2;
+						&& addShadow;
 
 				if (flag1) {
 					this.posX -= f1;
@@ -332,58 +343,49 @@ public class CustomFontRenderer extends FontRenderer {
 				}
 
 				Tessellator tessellator;
+				WorldRenderer worldrenderer;
 
 				if (this.strikethroughStyle) {
-					tessellator = Tessellator.instance;
-					GL11.glDisable(GL11.GL_TEXTURE_2D);
-					tessellator.startDrawingQuads();
-					tessellator.addVertex(this.posX,
-							this.posY
-									+ this.FONT_HEIGHT / 2 + 0.25F,
+					tessellator = Tessellator.getInstance();
+					worldrenderer = tessellator.getWorldRenderer();
+					GL11.glDisable(GL11.GL_TEXTURE_2D);//1.8 GlStateManager.func_179090_x();
+					worldrenderer.startDrawingQuads();
+					worldrenderer.addVertex((double)this.posX,
+							(double)(this.posY+(float)(this.FONT_HEIGHT / 2) + 0.25F),
 							0.0D);
-					tessellator.addVertex(this.posX + f,
-							this.posY
-									+ this.FONT_HEIGHT / 2 + 0.25F,
+					worldrenderer.addVertex((double)(this.posX + f),
+							(double)(this.posY+ (float)(this.FONT_HEIGHT / 2) + 0.25F),
 							0.0D);
-					tessellator.addVertex(this.posX + f,
-							this.posY
-									+ this.FONT_HEIGHT / 2 - 0.25F,
+					worldrenderer.addVertex((double)(this.posX + f),
+							(double)(this.posY+ (float)(this.FONT_HEIGHT / 2) - 0.25F),
 							0.0D);
-					tessellator.addVertex(this.posX,
-							this.posY
-									+ this.FONT_HEIGHT / 2 - 0.25F,
+					worldrenderer.addVertex((double)this.posX,
+							(double)(this.posY+ (float)(this.FONT_HEIGHT / 2) - 0.25F),
 							0.0D);
 					tessellator.draw();
-					GL11.glEnable(GL11.GL_TEXTURE_2D);
+					GL11.glEnable(GL11.GL_TEXTURE_2D);//1.8 GlStateManager.func_179098_w();
 				}
 
 				if (this.underlineStyle) {
-					tessellator = Tessellator.instance;
-					GL11.glDisable(GL11.GL_TEXTURE_2D);
-					tessellator.startDrawingQuads();
+					tessellator = Tessellator.getInstance();
+					worldrenderer = tessellator.getWorldRenderer();
+					GL11.glDisable(GL11.GL_TEXTURE_2D);//1.8 GlStateManager.func_179090_x();
+					worldrenderer.startDrawingQuads();
 					int l = this.underlineStyle ? -1 : 0;
-					tessellator
-							.addVertex(this.posX + l,
-									this.posY
-											+ this.FONT_HEIGHT - 0.5F,
+					worldrenderer.addVertex((double)(this.posX + l),
+							(double)(this.posY+ this.FONT_HEIGHT - 0.5F),
 									0.0D);
-					tessellator
-							.addVertex(this.posX + f,
-									this.posY
-											+ this.FONT_HEIGHT - 0.5F,
+					worldrenderer.addVertex((double)(this.posX + f),
+							(double)(this.posY+ this.FONT_HEIGHT - 0.5F),
 									0.0D);
-					tessellator
-							.addVertex(this.posX + f,
-									this.posY
-											+ this.FONT_HEIGHT - 1F,
+					worldrenderer.addVertex((double)(this.posX + f),
+							(double)(this.posY+ this.FONT_HEIGHT - 1F),
 									0.0D);
-					tessellator
-							.addVertex(this.posX + l,
-									this.posY
-											+ this.FONT_HEIGHT - 1F,
+					worldrenderer.addVertex((double)(this.posX + l),
+							(double)(this.posY+ this.FONT_HEIGHT - 1F),
 									0.0D);
 					tessellator.draw();
-					GL11.glEnable(GL11.GL_TEXTURE_2D);
+					GL11.glEnable(GL11.GL_TEXTURE_2D);//1.8 GlStateManager.func_179098_w();
 				}
 
 				this.posX += ((int) f);
@@ -399,10 +401,10 @@ public class CustomFontRenderer extends FontRenderer {
 			this.loadGlyphTexture(i);
 			int j = this.glyphWidth[par1] >>> 4;
 			int k = this.glyphWidth[par1] & 15;
-			float f = j;
-			float f1 = k + 1;
-			float f2 = par1 % 16 * 16 + f;
-			float f3 = (par1 & 255) / 16 * 16;
+			float f = (float)j;
+			float f1 = (float)(k + 1);
+			float f2 = (float)(par1 % 16 * 16) + f;
+			float f3 = (float)((par1 & 255) / 16 * 16);
 			float f4 = f1 - f - 0.02F;
 			float f5 = par2 ? 1.0F : 0.0F;
 			GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
@@ -427,12 +429,12 @@ public class CustomFontRenderer extends FontRenderer {
 		this.strikethroughStyle = false;
 	}
 
-	private String trimStringNewline(String par1Str) {
-		while (par1Str != null && par1Str.endsWith("\n")) {
-			par1Str = par1Str.substring(0, par1Str.length() - 1);
+	private String trimStringNewline(String str) {
+		while (str != null && str.endsWith("\n")) {
+			str = str.substring(0, str.length() - 1);
 		}
 
-		return par1Str;
+		return str;
 	}
 
 }

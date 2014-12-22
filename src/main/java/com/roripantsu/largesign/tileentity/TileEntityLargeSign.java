@@ -38,8 +38,7 @@ public class TileEntityLargeSign extends TileEntity {
 	public Packet getDescriptionPacket() {
 		NBTTagCompound nbttagcompound = new NBTTagCompound();
 		this.writeToNBT(nbttagcompound);
-		return new S35PacketUpdateTileEntity(this.xCoord, this.yCoord,
-				this.zCoord, 6, nbttagcompound);
+		return new S35PacketUpdateTileEntity(this.pos, 6, nbttagcompound);
 	}
 
 	public EntityPlayer getEntityPlayer() {
@@ -65,15 +64,13 @@ public class TileEntityLargeSign extends TileEntity {
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 
-		if (Minecraft.getMinecraft().theWorld.blockExists(pkt.func_148856_c(),
-				pkt.func_148855_d(), pkt.func_148854_e())) {
+		if (Minecraft.getMinecraft().theWorld.blockExists(pkt.func_179823_a())) {
 			TileEntity tileentity = Minecraft.getMinecraft().theWorld
-					.getTileEntity(pkt.func_148856_c(), pkt.func_148855_d(),
-							pkt.func_148854_e());
+					.getTileEntity(pkt.func_179823_a());
 
 			if (tileentity != null)
 				if (tileentity instanceof TileEntityLargeSign)
-					tileentity.readFromNBT(pkt.func_148857_g());
+					tileentity.readFromNBT(pkt.getNbtCompound());
 		}
 
 	}
@@ -121,9 +118,9 @@ public class TileEntityLargeSign extends TileEntity {
 	public void writeToNBT(NBTTagCompound NBTTC) {
 		
 		NBTTC.setString("id", TileEntityLargeSign.class.getSimpleName());
-		NBTTC.setInteger("x", this.xCoord);
-		NBTTC.setInteger("y", this.yCoord);
-		NBTTC.setInteger("z", this.zCoord);
+		NBTTC.setInteger("x", this.pos.getX());
+		NBTTC.setInteger("y", this.pos.getY());
+		NBTTC.setInteger("z", this.pos.getZ());
 		NBTTC.setInteger("theMetadata", this.theMetadata);//for Sub Block or Item
 		NBTTC.setInteger("modeNumber", this.modeNumber);
 		NBTTC.setInteger("largeSignTextColor", this.largeSignTextColor);
