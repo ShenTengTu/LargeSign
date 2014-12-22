@@ -32,7 +32,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class CustomTextureSprite extends TextureAtlasSprite {
 	
 	private static final Logger logger = LogManager.getLogger();
-	int anisotropicFiltering=Minecraft.getMinecraft().gameSettings.anisotropicFiltering;
 	int mipmapLevels=Minecraft.getMinecraft().gameSettings.mipmapLevels;
 	private final String basePath;
 	private boolean isSpecifiedRegion;
@@ -123,7 +122,8 @@ public class CustomTextureSprite extends TextureAtlasSprite {
             }
 
             AnimationMetadataSection animationmetadatasection = (AnimationMetadataSection)iresource.getMetadata("animation");
-            this.loadSprite(abufferedimage, animationmetadatasection, this.anisotropicFiltering > 1.0F);
+            //loadSprite
+            this.func_180598_a(abufferedimage, animationmetadatasection);
         }
         catch (RuntimeException runtimeexception)
         {

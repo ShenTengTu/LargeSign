@@ -1,12 +1,10 @@
 package com.roripantsu.largesign.proxy;
 
-import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
-import com.roripantsu.largesign.tileentity.TileEntityLargeSignRenderer;
-
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
+import com.roripantsu.largesign.manager.ModTileEntitys;
 
 /**
  *Differentiate between the combined client and the dedicated server.
@@ -34,11 +32,8 @@ public class ProxyClient extends ProxyCommon {
     }
 	
 	private void ClientRegistry() {
-		/* TileEntity */
-		ClientRegistry.registerTileEntity(TileEntityLargeSign.class,
-				TileEntityLargeSign.class.getSimpleName(),
-				new TileEntityLargeSignRenderer());
-		
+		/* TileEntitys */
+		ModTileEntitys.register();
 	}
 	
 }

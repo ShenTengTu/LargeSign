@@ -1,4 +1,4 @@
-package com.roripantsu.common.texture;
+package com.roripantsu.largesign.manager;
 
 /**
  * To quick invoke texture name.

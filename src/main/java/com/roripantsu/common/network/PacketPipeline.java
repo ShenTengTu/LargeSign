@@ -25,6 +25,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.roripantsu.largesign.Mod_LargeSign;
+import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
+import com.roripantsu.largesign.packet.CustomPacketEventListener;
+import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
+import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 
 /**
  *Controling communication for client and server
@@ -33,6 +37,7 @@ import com.roripantsu.largesign.Mod_LargeSign;
 @Sharable
 public class PacketPipeline {
 
+	private static PacketPipeline packetPipeline;
 	private static Minecraft MC=Minecraft.getMinecraft();
 	private static final Logger logger = LogManager.getLogger();
 	private FMLEventChannel channel;
@@ -171,5 +176,18 @@ public class PacketPipeline {
 	public void sendToServer(FMLProxyPacket pkt) {
 		this.channel.sendToServer(pkt);
 	}
+	
+	public static void init(){
+		packetPipeline=new PacketPipeline();
+		packetPipeline.registeEventListener(new CustomPacketEventListener(packetPipeline.getPacketsList()));
+		packetPipeline.registerPacket(SPacketUpdateLargeSign.class);
+		packetPipeline.registerPacket(SPacketLargeSignEditorOpen.class);
+		packetPipeline.registerPacket(CPacketUpdateLargeSign.class);
+	}
+	
+	public static PacketPipeline instance(){
+		return packetPipeline;
+	}
+	
 
 }

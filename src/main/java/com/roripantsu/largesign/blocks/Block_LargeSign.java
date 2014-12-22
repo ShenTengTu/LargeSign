@@ -26,8 +26,9 @@ import net.minecraftforge.event.ForgeEventFactory;
 
 import com.roripantsu.common.BasePath;
 import com.roripantsu.common.texture.CustomTextureSprite;
-import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.Mod_LargeSign;
+import com.roripantsu.largesign.manager.ETextureResource;
+import com.roripantsu.largesign.manager.ModBlocks;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -101,7 +102,7 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 		TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) world
 				.getTileEntity(x, y, z);
 		if(tileentitylargesign != null)
-			return Item.getItemFromBlock(Mod_LargeSign.proxy.block_LargeSign);	
+			return Item.getItemFromBlock(ModBlocks.LargeSign);	
 		else
 			return null;
 	}
@@ -109,7 +110,7 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 	/*LargeSign*/
 	@Override
 	public Item getItemDropped(int metadata, Random random, int fortune) {
-		return Item.getItemFromBlock(Mod_LargeSign.proxy.block_LargeSign);
+		return Item.getItemFromBlock(ModBlocks.LargeSign);
 	}
 	
 	
@@ -282,7 +283,7 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 	
 	        	ArrayList<ItemStack> items = new ArrayList<ItemStack>();
 	            ItemStack itemstack = 
-	            		new ItemStack(Mod_LargeSign.proxy.block_LargeSign,1,
+	            		new ItemStack(ModBlocks.LargeSign,1,
 	            				thetileEntity.getTheMetadata());//for Sub Block or Item
 	
 	            if (itemstack != null)

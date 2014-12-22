@@ -29,8 +29,8 @@ import org.apache.commons.lang3.text.StrBuilder;
 import org.lwjgl.opengl.GL11;
 
 import com.roripantsu.common.BasePath;
-import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.gui.CustomGuiTextAndFontStyleEditor;
+import com.roripantsu.largesign.manager.ETextureResource;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

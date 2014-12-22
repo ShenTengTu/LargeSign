@@ -13,6 +13,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.roripantsu.common.ModI18n;
+import com.roripantsu.common.network.PacketPipeline;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
@@ -200,12 +201,12 @@ public class GuiEditLargeSign extends GuiMainScreen {
 
 		try {
 			List<Object> list = new LinkedList<Object>();
-			Mod_LargeSign.proxy.packetPipeline.encode(thePacketC, list);
-			Mod_LargeSign.proxy.packetPipeline.encode(thePacketS, list);
+			PacketPipeline.instance().encode(thePacketC, list);
+			PacketPipeline.instance().encode(thePacketS, list);
 			FMLProxyPacket pktC = (FMLProxyPacket) list.get(0);
 			FMLProxyPacket pktS = (FMLProxyPacket) list.get(1);
-			Mod_LargeSign.proxy.packetPipeline.sendToServer(pktC);
-			Mod_LargeSign.proxy.packetPipeline.sendToAll(pktS);
+			PacketPipeline.instance().sendToServer(pktC);
+			PacketPipeline.instance().sendToAll(pktS);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

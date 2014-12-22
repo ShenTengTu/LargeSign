@@ -28,9 +28,9 @@ public class SPacketLargeSignEditorOpen extends ServerPacket {
 	}
 
 	public SPacketLargeSignEditorOpen(TileEntityLargeSign tileEntity) {
-		this.xCoordinate = tileEntity.xCoord;
-		this.yCoordinate = tileEntity.yCoord;
-		this.zCoordinate = tileEntity.zCoord;
+		this.xCoordinate = tileEntity.getPos().getX();
+		this.yCoordinate = tileEntity.getPos().getY();
+		this.zCoordinate = tileEntity.getPos().getZ();
 		this.theMetadata=tileEntity.getTheMetadata();//for Sub Block or Item
 		this.side=tileEntity.getSide();
 	}

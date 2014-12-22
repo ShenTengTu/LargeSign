@@ -10,6 +10,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.IIcon;
@@ -17,9 +18,10 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 import com.roripantsu.common.BasePath;
+import com.roripantsu.common.network.PacketPipeline;
 import com.roripantsu.common.texture.CustomTextureSprite;
-import com.roripantsu.common.texture.ETextureResource;
 import com.roripantsu.largesign.Mod_LargeSign;
+import com.roripantsu.largesign.manager.ETextureResource;
 import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
@@ -27,7 +29,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
+public class ItemBlock_LargeSign extends ItemBlock {
 	private final Block theBlock;
 	
 	//for Sub Block or Item>>
@@ -37,7 +39,7 @@ public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
     //<<for Sub Block or Item
     
 	public ItemBlock_LargeSign(Block block) {
-		super(block,block);
+		super(block);
 		this.theBlock=block;
 		this.maxStackSize = 8;
 		this.setUnlocalizedName(ItemBlock_LargeSign.class.getSimpleName());
@@ -150,9 +152,9 @@ public class ItemBlock_LargeSign extends ItemBlockWithMetadata {
 
 			try {
 				List<Object> list = new LinkedList<Object>();
-				Mod_LargeSign.proxy.packetPipeline.encode(thePacket, list);
+				PacketPipeline.instance().encode(thePacket, list);
 				FMLProxyPacket pkt = (FMLProxyPacket) list.get(0);
-				Mod_LargeSign.proxy.packetPipeline.sendTo(pkt,
+				PacketPipeline.instance().sendTo(pkt,
 						(EntityPlayerMP) entityPlayer);
 			} catch (Exception e) {
 				e.printStackTrace();
