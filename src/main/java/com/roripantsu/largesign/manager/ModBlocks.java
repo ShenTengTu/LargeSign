@@ -16,6 +16,6 @@ public class ModBlocks {
 	 
 	 public static void register(){
 		 GameRegistry.registerBlock(LargeSign,ItemBlock_LargeSign.class,
-					RegistryName.BlockLargeSign);
+					NameManager.Registry.LargeSign);
 	 }
 }

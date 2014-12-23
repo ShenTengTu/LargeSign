@@ -17,6 +17,9 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.fml.common.registry.GameData;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -26,10 +29,6 @@ import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.CustomGuiButton;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.guilib.GuiSubScreen;
-
-import net.minecraftforge.fml.common.registry.GameData;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Sub Gui Screen of Large Sign Editor
@@ -134,8 +133,9 @@ public class CustomGuiIconList extends GuiSubScreen {
             for (int i = 0; i < list.size(); ++i)
             {
                 String s1 = (String)list.get(i);
-                font.drawStringWithShadow(s1, OffsetX, OffsetY, -1);
-
+                //font.drawStringWithShadow(s1, OffsetX, OffsetY, -1);
+                font.func_175063_a(s1, OffsetX, OffsetY, -1);
+                
                 if (i == 0)
                 {
                     OffsetY += 2;
@@ -294,7 +294,7 @@ public class CustomGuiIconList extends GuiSubScreen {
 				
 				for (ItemStack itemStack : subItemList){
 					if(id==373){
-						if(!ignoreMetaList.contains(itemStack.getItemDamageForDisplay()))
+						if(!ignoreMetaList.contains(itemStack.getItemDamage()))
 							itemList.add(itemStack);
 					}else{
 						
@@ -347,7 +347,7 @@ private void changePage() {
 		Iterator<CustomGuiButton> iterator=this.buttonListMap.get(this.page).iterator();
 		while(iterator.hasNext()){
 			CustomGuiButton btn=iterator.next();
-			if(btn.id >= this.nextBtn.id+1 && btn.getHoverState(btn.func_146115_a())==2)
+			if(btn.id >= this.nextBtn.id+1 && btn.isMouseOver())
 				return btn;
 		}
 		return null;

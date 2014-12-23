@@ -2,16 +2,11 @@ package com.roripantsu.largesign.tileentity;
 
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureCompass;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.Entity;
@@ -21,11 +16,11 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.apache.commons.lang3.text.StrBuilder;
 import org.lwjgl.opengl.GL11;
@@ -33,9 +28,6 @@ import org.lwjgl.opengl.GL11;
 import com.roripantsu.common.BasePath;
 import com.roripantsu.largesign.gui.CustomGuiTextAndFontStyleEditor;
 import com.roripantsu.largesign.manager.ETextureResource;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Tile entity special renderer of Large Sign
@@ -170,7 +162,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 		int y=tileEntity.getPos().getY();
 		int z=tileEntity.getPos().getZ();
 		
-		int direction=Direction.facingToDirection[tileEntity.getSide()];
+		int direction=tileEntity.getSide().getHorizontalIndex();
 		ItemStack itemStack = tileEntity.getItemStack();
 		
 		if(!tileEntity.getNBTTC().hasKey("itemStack")){
@@ -183,15 +175,15 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
             entityitem.getEntityItem().stackSize = 1;
             entityitem.hoverStart = 0.0F;
            
+            TextureAtlasSprite textureatlassprite = null;
             
             if (item == Items.compass)
             {
-                TextureManager texturemanager = Minecraft.getMinecraft().getTextureManager();
-                texturemanager.bindTexture(TextureMap.locationItemsTexture);
-                TextureAtlasSprite textureatlassprite1 = ((TextureMap)texturemanager.getTexture(TextureMap.locationItemsTexture)).getAtlasSprite(Items.compass.getIconIndex(entityitem.getEntityItem()).getIconName());
-
-                if (textureatlassprite1 instanceof TextureCompass){
-                    TextureCompass texturecompass = (TextureCompass)textureatlassprite1;
+                textureatlassprite = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(TextureCompass.field_176608_l);
+                Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.locationBlocksTexture);
+                
+                if (textureatlassprite instanceof TextureCompass){
+                    TextureCompass texturecompass = (TextureCompass)textureatlassprite;
                     double d0 = texturecompass.currentAngle;
                     double d1 = texturecompass.angleDelta;
                     texturecompass.currentAngle = 0.0D;
@@ -199,12 +191,12 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
                     texturecompass.updateCompass(world, x, z, (double)MathHelper.wrapAngleTo180_float((float)(180 + direction*90)), false, true);
                     texturecompass.currentAngle = d0;
                     texturecompass.angleDelta = d1;
+                }else{
+                    textureatlassprite = null;
                 }
             }
             
-            boolean flag = itemStack.getItemSpriteNumber() == 0 
-            		&& itemStack.getItem() instanceof ItemBlock 
-            		&& RenderBlocks.renderItemIn3d(Block.getBlockFromItem(itemStack.getItem()).getRenderType());
+            boolean flag =itemStack.getItem() instanceof ItemBlock;
             double scale=flag?1.85D:1.5D;
             double rotateY=flag?-90D:180D;
             double rotateZ=flag?-15D:0D;
@@ -214,16 +206,13 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
     		GL11.glScaled(scale, scale, scale);
     		GL11.glRotated(rotateY, 0.0D, 1.0D, 0.0D);
     		GL11.glRotated(rotateZ, 0.0D, 0.0D, 1.0D);
-            RenderManager.instance.renderEntityWithPosYaw(entityitem,(flag?-0.4D/scale:0.0D), -(flag?0.15D:0.21285D), (flag?0.0D:0.43725D/scale), 0.0F, 0.0F);
+    		Minecraft.getMinecraft().getRenderManager().renderEntityWithPosYaw(entityitem,(flag?-0.4D/scale:0.0D), -(flag?0.15D:0.21285D), (flag?0.0D:0.43725D/scale), 0.0F, 0.0F);
             GL11.glPopMatrix();
             RenderHelper.disableStandardItemLighting();
     		
-            if (item == Items.compass){
-                TextureAtlasSprite textureatlassprite = ((TextureMap)Minecraft.getMinecraft().getTextureManager().getTexture(TextureMap.locationItemsTexture)).getAtlasSprite(Items.compass.getIconIndex(entityitem.getEntityItem()).getIconName());
-
-                if (textureatlassprite.getFrameCount() > 0)
-                    textureatlassprite.updateAnimation();
-            }  
+            if (textureatlassprite != null && textureatlassprite.getFrameCount() > 0){
+                textureatlassprite.updateAnimation();
+            } 
         }
 		
 		if(!tileEntity.getNBTTC().hasKey("itemStack") && showWarning ){

@@ -8,15 +8,15 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.mojang.authlib.GameProfile;
 import com.roripantsu.largesign.gui.GuiEditLargeSign;
 import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
 import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *handle opening Large Sign editor and updating Large Sign at client side
@@ -54,7 +54,7 @@ public class NetHandlerPlayClientSide extends NetHandlerPlayClient {
 		int y=thePacket.getYCoordinate();
 		int z=thePacket.getZCoordinate();
 		int theMetadata=thePacket.getTheMetadata();//for Sub Block or Item
-		int side=thePacket.getSide();
+		EnumFacing side=thePacket.getSide();
 		
 		TileEntity tileEntity = this.gameController.theWorld.getTileEntity(new BlockPos(x,y,z));
 		

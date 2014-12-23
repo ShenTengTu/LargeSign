@@ -4,137 +4,92 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemBlockWithMetadata;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-
-import com.roripantsu.common.BasePath;
-import com.roripantsu.common.network.PacketPipeline;
-import com.roripantsu.common.texture.CustomTextureSprite;
-import com.roripantsu.largesign.Mod_LargeSign;
-import com.roripantsu.largesign.manager.ETextureResource;
-import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
-import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
-
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import com.roripantsu.common.network.PacketPipeline;
+import com.roripantsu.largesign.blocks.Block_LargeSign;
+import com.roripantsu.largesign.manager.NameManager;
+import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
+import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
+
 public class ItemBlock_LargeSign extends ItemBlock {
+	
 	private final Block theBlock;
 	
-	//for Sub Block or Item>>
-	public static final String[] textureNames =ETextureResource.Item_large_sign.textureName;
-    @SideOnly(Side.CLIENT)
-    private IIcon[] subIcons;
-    //<<for Sub Block or Item
-    
 	public ItemBlock_LargeSign(Block block) {
 		super(block);
 		this.theBlock=block;
 		this.maxStackSize = 8;
-		this.setUnlocalizedName(ItemBlock_LargeSign.class.getSimpleName());
-		this.setTextureName(textureNames[0]);
+		this.setUnlocalizedName(NameManager.Unlocalized.ItemLargeSign);
 	}
 	
 	//for Sub Block or Item
 	@Override
 	public String getUnlocalizedName(ItemStack stack) {
-		String[] suffix=ETextureResource.Enttity_large_sign.fileNameSuffix;
+		String[] suffix=NameManager.Unlocalized.SubLargeSign;
 		int i = MathHelper.clamp_int(stack.getItemDamage(), 0, suffix.length-1);
-		return this.getUnlocalizedName()+"_"+
-				ETextureResource.Enttity_large_sign.fileNameSuffix[i];
+		return this.getUnlocalizedName()+"_"+suffix[i];
 	}
-	
-	//for Sub Block or Item
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerIcons(IIconRegister iconRegister) {
-		subIcons=new IIcon[textureNames.length];
 		
-		 for (int i = 0; i < subIcons.length;i++){
-		//load the specified resource to be block icon and register it.
-		CustomTextureSprite textureSprite=
-				new CustomTextureSprite(BasePath.Items,textureNames[i]);
-		((TextureMap)iconRegister).setTextureEntry(textureNames[i], textureSprite);
-		subIcons[i]=textureSprite;
-		 }
-	}
-	
-	//for Sub Block or Item
-	@Override
-	@SideOnly(Side.CLIENT)
-	public IIcon getIconFromDamage(int meta) {
-		int i = MathHelper.clamp_int(meta, 0, textureNames.length-1);
-	    return this.subIcons[i];
-	}
-	
 	//for Sub Block or Item
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void getSubItems(Item item, CreativeTabs tab, List list) {
-	    for (int i = 0; i < textureNames.length; i ++) {
+	    for (int i = 0; i < NameManager.Unlocalized.SubLargeSign.length; i ++) {
 	        list.add(new ItemStack(item, 1, i));
 	    }
 	}
 	
 	@Override
 	public boolean onItemUse(ItemStack itemStack, EntityPlayer entityPlayer,
-			World world, int x, int y, int z, int side, float hitX,
+			World world, BlockPos pos, EnumFacing side, float hitX,
 			float hitY, float hitZ) {
 		
-		Block prevBlock = world.getBlock(x,y,z);
+		IBlockState blockState = world.getBlockState(pos);
 		
-		if (side == 0)//bottom
+		if (side == EnumFacing.DOWN || side ==EnumFacing.UP)
 			return false;
-		else if (!prevBlock.getMaterial().isSolid())
+		else if (!blockState.getBlock().getMaterial().isSolid())
 
 			return false;
 		else {
-			if (side == 1)//top
+			
+			pos = pos.offset(side);
+
+			if (!entityPlayer.func_175151_a(pos, side, itemStack))
 				return false;
-
-			if (side == 2)//north
-				--z;
-
-			if (side == 3)//south
-				++z;
-
-			if (side == 4)//west
-				--x;
-
-			if (side == 5)//east
-				++x;
-
-			if (!entityPlayer.canPlayerEdit(x, y, z, side, itemStack))
-				return false;
-			else if (!this.theBlock.canPlaceBlockAt(world, x,
-					y, z))
+			else if (!this.theBlock.canPlaceBlockAt(world, pos))
 				return false;
 			else if (world.isRemote)
 				return true;
 			else {
-				this.theBlock.onBlockPlacedBy(world, x, y, z, entityPlayer, itemStack);//for Sub Block or Item
-				world.setBlock(x, y, z, this.theBlock, side, 3);
+				
+				blockState = this.theBlock.getDefaultState();
+				world.setBlockState(pos, blockState.withProperty(Block_LargeSign.PROP_FACING, side));
+				world.setBlockState(pos, blockState.withProperty(Block_LargeSign.PROP_SUB_TYPE, Block_LargeSign.ESubType.getType(itemStack.getItemDamage())));
 				
 	            --itemStack.stackSize;
 
 				TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) world
-						.getTileEntity(x, y, z);
+						.getTileEntity(pos);
 
 				if (tileentitylargesign != null){			        
 					tileentitylargesign.setSide(side);
-					this.func_LargeSign(entityPlayer,tileentitylargesign);
+					this.openLargeSignEditor(entityPlayer,tileentitylargesign);
 				}
 
 				return true;
@@ -142,7 +97,7 @@ public class ItemBlock_LargeSign extends ItemBlock {
 		}
 	}
 
-	private void func_LargeSign(EntityPlayer entityPlayer,
+	private void openLargeSignEditor(EntityPlayer entityPlayer,
 			TileEntityLargeSign tileEntity) {
 		if (entityPlayer instanceof EntityPlayerMP) {
 			tileEntity.setEntityPlayer(entityPlayer);

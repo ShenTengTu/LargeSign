@@ -9,14 +9,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.CustomGuiButton;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.guilib.GuiSubScreen;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Sub Gui Screen of Large Sign Editor
@@ -200,13 +199,13 @@ public class CustomGuiColorSwitcher extends GuiSubScreen {
 				this.RGBA[3]);
 		
 		this.textFieldList.add(this.redTextField = 
-				new GuiTextField(this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+2),fixW(20),16));
+				new GuiTextField(id,this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+2),fixW(20),16));
 		this.textFieldList.add(this.greenTextField = 
-				new GuiTextField(this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+22),fixW(20),16));
+				new GuiTextField(id+1,this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+22),fixW(20),16));
 		this.textFieldList.add(this.blueTextField = 
-				new GuiTextField(this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+42),fixW(20),16));
+				new GuiTextField(id+2,this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+42),fixW(20),16));
 		this.textFieldList.add(this.alphaTextField = 
-				new GuiTextField(this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+62),fixW(20),16));
+				new GuiTextField(id+3,this.fontRendererObj,this.GroupX+fixW(20),this.GroupY+fixH(this.gridHeight*4+62),fixW(20),16));
 		this.redTextField.setMaxStringLength(3);
 		this.greenTextField.setMaxStringLength(3);
 		this.blueTextField.setMaxStringLength(3);

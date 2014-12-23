@@ -6,13 +6,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.roripantsu.common.network.ClientPacket;
 import com.roripantsu.common.network.NetHandlerPlayServerSide;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *the packet which handle Updating Large Sign for client

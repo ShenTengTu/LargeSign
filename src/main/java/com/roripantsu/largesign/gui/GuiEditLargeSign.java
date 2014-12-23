@@ -1,6 +1,7 @@
 package com.roripantsu.largesign.gui;
 
 import java.awt.Color;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,6 +9,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -15,15 +20,11 @@ import org.lwjgl.opengl.GL11;
 import com.roripantsu.common.ModI18n;
 import com.roripantsu.common.network.PacketPipeline;
 import com.roripantsu.guilib.GuiMainScreen;
-import com.roripantsu.largesign.Mod_LargeSign;
+import com.roripantsu.largesign.blocks.Block_LargeSign;
 import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
 import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSignRenderer;
-
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Main Gui Screen of Large Sign Editor
@@ -87,7 +88,7 @@ public class GuiEditLargeSign extends GuiMainScreen {
 	}
 	
 	@Override
-	protected void mouseClicked(int x, int y, int buttonClicked) {
+	protected void mouseClicked(int x, int y, int buttonClicked) throws IOException {
 		this.fontStyleChooser.mouseClicked(x, y, buttonClicked);
 		this.colorChooser.mouseClicked(x, y, buttonClicked);
 		super.mouseClicked(x, y, buttonClicked);//for all button.
@@ -245,8 +246,9 @@ public class GuiEditLargeSign extends GuiMainScreen {
 
 		float SizePercent = 85F;
 		float angle = 0.0F;
-		int k = this.mc.theWorld.getBlockMetadata(this.tileLargeSign.xCoord,
-				this.tileLargeSign.yCoord, this.tileLargeSign.zCoord);
+		EnumFacing k = (EnumFacing)this.mc.theWorld
+				.getBlockState(this.tileLargeSign.getPos())
+				.getValue(Block_LargeSign.PROP_FACING);
 		
 		
 		GL11.glPushMatrix();
@@ -255,13 +257,13 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		GL11.glScalef(-SizePercent, -SizePercent, -SizePercent);
 		GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
 
-		if (k == 2)
+		if (k == EnumFacing.NORTH)
 			angle = 180.0F;
 
-		if (k == 4)
+		if (k == EnumFacing.WEST)
 			angle = 90.0F;
 
-		if (k == 5)
+		if (k == EnumFacing.EAST)
 			angle = -90.0F;
 
 		GL11.glRotatef(angle, 0.0F, 1.0F, 0.0F);

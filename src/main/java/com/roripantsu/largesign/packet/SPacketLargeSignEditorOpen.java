@@ -4,13 +4,13 @@ import java.io.IOException;
 
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import com.roripantsu.common.network.NetHandlerPlayClientSide;
 import com.roripantsu.common.network.ServerPacket;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *the packet which handle command for opening Large Sign editor
@@ -22,7 +22,7 @@ public class SPacketLargeSignEditorOpen extends ServerPacket {
 	private int yCoordinate;
 	private int zCoordinate;
 	private int theMetadata;////for Sub Block or Item
-	private int side;
+	private EnumFacing side;
 
 	public SPacketLargeSignEditorOpen() {
 	}
@@ -57,7 +57,7 @@ public class SPacketLargeSignEditorOpen extends ServerPacket {
 	}
 	
 	@SideOnly(Side.CLIENT)
-	public int getSide() {
+	public EnumFacing getSide() {
 		return side;
 	}
 
@@ -72,7 +72,7 @@ public class SPacketLargeSignEditorOpen extends ServerPacket {
 		this.yCoordinate = buffer.readInt();
 		this.zCoordinate = buffer.readInt();
 		this.theMetadata=buffer.readInt();//for Sub Block or Item
-		this.side=buffer.readInt();
+		this.side=EnumFacing.getHorizontal(buffer.readInt());
 		
 	}
 
@@ -82,7 +82,7 @@ public class SPacketLargeSignEditorOpen extends ServerPacket {
 		buffer.writeInt(this.yCoordinate);
 		buffer.writeInt(this.zCoordinate);
 		buffer.writeInt(this.theMetadata);//for Sub Block or Item
-		buffer.writeInt(this.side);
+		buffer.writeInt(this.side.getHorizontalIndex());
 	}
 
 	@Override

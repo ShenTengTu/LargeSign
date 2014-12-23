@@ -1,38 +1,35 @@
 package com.roripantsu.largesign.blocks;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.event.ForgeEventFactory;
-
-import com.roripantsu.common.BasePath;
-import com.roripantsu.common.texture.CustomTextureSprite;
-import com.roripantsu.largesign.Mod_LargeSign;
-import com.roripantsu.largesign.manager.ETextureResource;
-import com.roripantsu.largesign.manager.ModBlocks;
-import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
-
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.roripantsu.largesign.Mod_LargeSign;
+import com.roripantsu.largesign.manager.ETextureResource;
+import com.roripantsu.largesign.manager.NameManager;
+import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 /**
  *Block class of Large Sign,some methods content same as BlockSign.
@@ -40,17 +37,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  *"TheMetadata" represent id of sub blocks.
  *@author ShenTeng Tu(RoriPantsu)
  */
-public class Block_LargeSign extends Block implements ITileEntityProvider {
+public class Block_LargeSign extends BlockContainer {
 
 	private Class<?> tileEntityClass;
 
 	
 	//for Sub Block or Item>>
+	public static final PropertyEnum PROP_SUB_TYPE = PropertyEnum.create("sub_type", Block_LargeSign.ESubType.class);
+	public static final PropertyDirection PROP_FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
     public static final String[] textureNames =ETextureResource.Enttity_large_sign.textureName;
-    @SideOnly(Side.CLIENT)
-    private static IIcon[] subIcons;
-    private int theMetadata;
-    private TileEntityLargeSign thetileEntity;
     //<<for Sub Block or Item
     
 	public Block_LargeSign(Class<?> tileEntityLargeSign) {
@@ -59,266 +54,197 @@ public class Block_LargeSign extends Block implements ITileEntityProvider {
 		this.setHardness(1.0F);
 		this.setStepSound(soundTypeWood);
 		this.setCreativeTab(Mod_LargeSign.tab_modRoriPantsu);
-		this.setBlockName(Block_LargeSign.class.getSimpleName());
-		this.setBlockTextureName(textureNames[0]);
+		this.setUnlocalizedName(NameManager.Unlocalized.BlockLargeSign);
+		
+		this.setDefaultState(this.blockState.getBaseState().withProperty(PROP_FACING, EnumFacing.NORTH));
+		//for Sub Block or Item
+		this.setDefaultState(this.blockState.getBaseState().withProperty(PROP_SUB_TYPE, Block_LargeSign.ESubType.OAK));
+		//this.setBlockTextureName(textureNames[0]);
 	}
 	
-	
+    /** create BlockState instance using IProperty array*/
+    //for Sub Block or Item
+    @Override
+    protected BlockState createBlockState(){
+        return new BlockState(this, new IProperty[] {PROP_SUB_TYPE,PROP_FACING});
+    }
+		
+    //for Sub Block or Item
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(PROP_SUB_TYPE, Block_LargeSign.ESubType.getType(meta));
+    }
+    
+    
+    //for Sub Block or Item
+    @Override
+    public int getMetaFromState(IBlockState state){
+        return ((Block_LargeSign.ESubType)state.getValue(PROP_SUB_TYPE)).getSubID();
+    }
+    
 	@Override
-	public TileEntity createNewTileEntity(World world, int metaData) {
+	public TileEntity createNewTileEntity(World world, int meta) {
 		try {
 			TileEntityLargeSign tileEntity=(TileEntityLargeSign) this.tileEntityClass.newInstance();
-			tileEntity.setTheMetadata(this.theMetadata);//for Sub Block or Item
+			tileEntity.setTheMetadata(meta);//for Sub Block or Item
 			return (TileEntity) tileEntity;
 		} catch (Exception exception) {
 			throw new RuntimeException(exception);
 		}
 	}
-
+	
+	/*LargeSign*/
+	//For a user uses the creative pick block button on this block.
 	@Override
-	public boolean getBlocksMovement(IBlockAccess blockAccess, int x, int y,
-			int z) {
-		return true;
+	@SideOnly(Side.CLIENT)
+	public Item getItem(World world, BlockPos pos) {
+			return Item.getItemFromBlock(world.getBlockState(pos).getBlock());
 	}
-
+	
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World world, int x,
-			int y, int z) {
+	public Item getItemDropped(IBlockState state, Random random, int fortune) {
+		return Item.getItemFromBlock(state.getBlock());
+	}
+	
+	//for Sub Block or Item
+	@Override
+    public int damageDropped(IBlockState state) {
+		return ((Block_LargeSign.ESubType)state.getValue(PROP_SUB_TYPE)).getSubID();
+    }
+	
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(World world, BlockPos pos, IBlockState state) {
 		return null;
 	}
 	
-	//This fuction will affect destroy particle
-	//for Sub Block or Item
 	@Override
 	@SideOnly(Side.CLIENT)
-	public IIcon getIcon(int side, int metaData) {
-		int i = MathHelper.clamp_int(this.theMetadata, 0, subIcons.length-1);
-		return subIcons[i];
-	}
-	
-	/*LargeSign*/
-	@SideOnly(Side.CLIENT)
-	public Item getItem(World world, int x, int y, int z) {
-		TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) world
-				.getTileEntity(x, y, z);
-		if(tileentitylargesign != null)
-			return Item.getItemFromBlock(ModBlocks.LargeSign);	
-		else
-			return null;
+	public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos pos) {
+		this.setBlockBoundsBasedOnState(world, pos);
+		return super.getSelectedBoundingBox(world, pos);
 	}
 	
 	/*LargeSign*/
 	@Override
-	public Item getItemDropped(int metadata, Random random, int fortune) {
-		return Item.getItemFromBlock(ModBlocks.LargeSign);
-	}
-	
-	
-	@Override
-	public int getRenderType() {
-		return -1;
-	}
+	public void setBlockBoundsBasedOnState(IBlockAccess blockAccess, BlockPos pos) {
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World world, int x,
-			int y, int z) {
-		this.setBlockBoundsBasedOnState(world, x, y, z);
-		return super.getSelectedBoundingBoxFromPool(world, x, y, z);
+		EnumFacing enumfacing = (EnumFacing)blockAccess.getBlockState(pos).getValue(PROP_FACING);
+		float thickness = 0.125F;
+		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+		if (enumfacing == EnumFacing.NORTH)
+			this.setBlockBounds(0.0F, 0.0F, 1.0F - thickness, 1.0F, 1.0F, 1.0F);
+		if (enumfacing == EnumFacing.SOUTH)
+			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, thickness);
+		if (enumfacing == EnumFacing.WEST)
+			this.setBlockBounds(1.0F - thickness, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+		if (enumfacing == EnumFacing.EAST)
+			this.setBlockBounds(0.0F, 0.0F, 0.0F, thickness, 1.0F, 1.0F);
 	}
+	
+	@Override
+    public boolean isFullCube()
+    {
+        return false;
+    }
+    
+    @Override
+    public boolean isPassable(IBlockAccess blockAccess, BlockPos pos)
+    {
+        return true;
+    }
 
 	@Override
 	public boolean isOpaqueCube() {
 		return false;
 	}
 	
-	/*LargeSign*/
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z,
-			Block theBlock) {
-
-		boolean flag = false;
-
-		int side = world.getBlockMetadata(x, y, z);
-		flag = true;
-
-		if (side == 2 && world.getBlock(x, y, z + 1).getMaterial().isSolid()) {
-			flag = false;
-		}
-
-		if (side == 3 && world.getBlock(x, y, z - 1).getMaterial().isSolid()) {
-			flag = false;
-		}
-
-		if (side == 4 && world.getBlock(x + 1, y, z).getMaterial().isSolid()) {
-			flag = false;
-		}
-
-		if (side == 5 && world.getBlock(x - 1, y, z).getMaterial().isSolid()) {
-			flag = false;
-		}
-		
-		/*when the specified neighbor block is not solid,
-		this block will be destroyed and drops its item. */
-		if (flag) {
-	       
-			this.thetileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);
-			if(this.thetileEntity != null){
-				//for Sub Block or Item
-				this.dropBlockAsItem(world, x, y, z,
-						this.thetileEntity.getTheMetadata(), 0);
-				
-				world.setBlockToAir(x, y, z);
-				
-			}
-		}
+	public int getRenderType() {
+		return -1;
 	}
-	
-	//for Sub Block or Item
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerBlockIcons(IIconRegister iconRegister) {
-		subIcons=new IIcon[textureNames.length];
-		
-		 for (int i = 0; i < subIcons.length;i++){
-		//load the specified resource to be block icon and register it.
-		CustomTextureSprite textureSprite=
-				new CustomTextureSprite(2,2,16,16,BasePath.Entity,textureNames[i]);
-		((TextureMap)iconRegister).setTextureEntry(textureNames[i], textureSprite);
-		subIcons[i]=textureSprite;
-		 }
-	}
-
-	@Override
-	public boolean renderAsNormalBlock() {
-		return false;
-	}
-	
-	/*LargeSign*/
-	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess blockAccess, int x,
-			int y, int z) {
-
-		int l = blockAccess.getBlockMetadata(x, y, z);
-		float thickness = 0.125F;
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-
-		if (l == 2) {
-			this.setBlockBounds(0.0F, 0.0F, 1.0F - thickness, 1.0F, 1.0F, 1.0F);
-		}
-
-		if (l == 3) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, thickness);
-		}
-
-		if (l == 4) {
-			this.setBlockBounds(1.0F - thickness, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-		}
-
-		if (l == 5) {
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, thickness, 1.0F, 1.0F);
-		}
-	}
-	
-	//for Sub Block or Item
-	@Override
-    public int damageDropped(int Metadata)
-    {
-        return Metadata;
-    }
-
-	//for Sub Block or Item
-	public int getTheMetadata() {
-		return this.theMetadata;
-	}
-
-	//for Sub Block or Item
-	public void setTheMetadata(int theMetadata) {
-		this.theMetadata = theMetadata;
-	}
-	
+			
 	//for Sub Block or Item
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	@SideOnly(Side.CLIENT)
     @Override
     public void getSubBlocks(Item item, CreativeTabs tabs, List list)
     {
-        for(int i=0;i<textureNames.length;i++)
-        	list.add(new ItemStack(item, 1, i));
+        Block_LargeSign.ESubType[] subType = Block_LargeSign.ESubType.values();
+    	
+    	for(int i=0;i<subType.length;i++)
+        	list.add(new ItemStack(item, 1, subType[i].getSubID()));
 
     }
     
-    //for Sub Block or Item
-    @Override
-    public void onBlockPlacedBy(World world,int x,int y,int z,EntityLivingBase entityPlayer,ItemStack itemStack){
-    	this.theMetadata=itemStack.getItemDamage();
-    	this.thetileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);
-    }
-   
-    //for Sub Block or Item
-    @Override
-    public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest)
-    {	
-    	return this.removedByPlayer(world, player, x, y, z);
-    }
-    
-    //for Sub Block or Item
-    @Override
-    public boolean removedByPlayer(World world, EntityPlayer entityPlayer, int x, int y, int z)
-    {
-        this.thetileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);      
-    	return world.setBlockToAir(x, y, z);
-    }
-    
-    //for Sub Block or Item
-    @Override
-    public void harvestBlock(World world, EntityPlayer entityPlayer, int x, int y, int z, int side)
-    {
-        entityPlayer.addStat(StatList.mineBlockStatArray[getIdFromBlock(this)], 1);
-        entityPlayer.addExhaustion(0.025F);
-        
-        if(thetileEntity!=null){
-	        if (this.canSilkHarvest(world, entityPlayer, x, y, z, side) && EnchantmentHelper.getSilkTouchModifier(entityPlayer))
-	        {
-	
-	        	ArrayList<ItemStack> items = new ArrayList<ItemStack>();
-	            ItemStack itemstack = 
-	            		new ItemStack(ModBlocks.LargeSign,1,
-	            				thetileEntity.getTheMetadata());//for Sub Block or Item
-	
-	            if (itemstack != null)
-	            {
-	                items.add(itemstack);
-	            }
-	
-	            ForgeEventFactory.fireBlockHarvesting(items, world, this, x, y, z, side, 0, 1.0f, true, entityPlayer);
-	            for (ItemStack is : items)
-	            {
-	                this.dropBlockAsItem(world, x, y, z, is);
-	            }
-	        }
-	        else
-	        {
-	            harvesters.set(entityPlayer);
-	            int fortune = EnchantmentHelper.getFortuneModifier(entityPlayer);
-	            this.dropBlockAsItem(world, x, y, z, 
-	            		thetileEntity.getTheMetadata(), fortune);//for Sub Block or Item
-	            harvesters.set(null);
-	        }
+	/*LargeSign*/
+	@Override
+	public void onNeighborBlockChange(World world, BlockPos pos, IBlockState state,
+			Block theBlock) {
+		
+		EnumFacing enumfacing = (EnumFacing)state.getValue(PROP_FACING);
+		
+		/*when the specified neighbor block is not solid,
+		this block will be destroyed and drops its item. */
+        if (!world.getBlockState(pos.offset(enumfacing.getOpposite())).getBlock().getMaterial().isSolid())
+        {
+            this.dropBlockAsItem(world, pos, state, 0);
+            world.setBlockToAir(pos);
         }
-    }
-    
+					
+	}
+          
     @Override
-    public void onBlockClicked(World world, int x, int y, int z, EntityPlayer entityPlayer) {
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer entityPlayer) {
     	//for Large Sign Rotation.
     	if(entityPlayer.isSneaking()){
-    		TileEntityLargeSign tileEntity = (TileEntityLargeSign) world.getTileEntity(x, y, z);
+    		TileEntityLargeSign tileEntity = (TileEntityLargeSign) world.getTileEntity(pos);
     		if(tileEntity!=null){
     				tileEntity.rotate+=45F;
     				if(tileEntity.rotate==360F)
     					tileEntity.rotate=0;
     		}
     	}
+    	
+    }
+    
+    public static enum ESubType implements IStringSerializable{
+		
+        OAK(0, "oak"),
+        SPRUCE(1, "spruce"),
+        BIRCH(2, "birch"),
+        JUNGLE(3, "jungle"),
+        ACACIA(4, "acacia"),
+        DARK_OAK(5, "dark_oak");
+        
+        private final int subID;
+        private final String name;
+        
+        private ESubType(int subID ,String name) {
+        	this.subID=subID;
+        	this.name=name;
+        }
+        
+        public int getSubID()
+        {
+            return subID;
+        }
+        
+        public String toString()
+        {
+            return name;
+        }
+        
+        public static Block_LargeSign.ESubType getType(int subID)
+        {
+        	int i = MathHelper.clamp_int(subID, 0, values().length);
+
+            return values()[i];
+        }
+        
+		@Override
+		public String getName() {
+			return name;
+		}
     	
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -31,7 +32,7 @@ public class TileEntityLargeSign extends TileEntity {
 	private EntityPlayer entityPlayer;
 	private NBTTagCompound NBTTC = new NBTTagCompound();
 	private int theMetadata=0;//for Sub Block or Item
-	private int side;
+	private EnumFacing side;
 	private ItemStack itemStack;
 
 	@Override
@@ -53,25 +54,21 @@ public class TileEntityLargeSign extends TileEntity {
 		return this.Editable;
 	}
 
-	public int getSide() {
+	public EnumFacing getSide() {
 		return this.side;
 	}
 
-	public void setSide(int value) {
-		this.side = value;
+	public void setSide(EnumFacing side) {
+		this.side = side;
 	}
 
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
-
-		if (Minecraft.getMinecraft().theWorld.blockExists(pkt.func_179823_a())) {
-			TileEntity tileentity = Minecraft.getMinecraft().theWorld
-					.getTileEntity(pkt.func_179823_a());
-
-			if (tileentity != null)
-				if (tileentity instanceof TileEntityLargeSign)
-					tileentity.readFromNBT(pkt.getNbtCompound());
-		}
+			
+		TileEntity tileentity = Minecraft.getMinecraft().theWorld.getTileEntity(pkt.func_179823_a());
+		if (tileentity != null)
+			if (tileentity instanceof TileEntityLargeSign)
+				tileentity.readFromNBT(pkt.getNbtCompound());
 
 	}
 
@@ -90,7 +87,7 @@ public class TileEntityLargeSign extends TileEntity {
 		this.YAdjust = NBTTC.getFloat("YAdjust");
 		this.rotate = NBTTC.getFloat("rotate");
 		this.scaleAdjust = NBTTC.getFloat("scaleAdjust");
-		this.side=NBTTC.getInteger("side");
+		this.side=EnumFacing.getHorizontal(NBTTC.getInteger("side"));
 		if(NBTTC.hasKey("itemStack"))
 			this.itemStack=ItemStack.loadItemStackFromNBT(NBTTC.getCompoundTag("itemStack"));
 		this.NBTTC = NBTTC;
@@ -132,7 +129,7 @@ public class TileEntityLargeSign extends TileEntity {
 		NBTTC.setFloat("scaleAdjust", this.scaleAdjust);
 		NBTTC.setFloat("rotate", this.rotate);
 		NBTTC.setString("largeSignText", this.largeSignText[0]);
-		NBTTC.setInteger("side",this.side);
+		NBTTC.setInteger("side",this.side.getHorizontalIndex());
 		if(this.itemStack!=null)
 			NBTTC.setTag("itemStack", this.itemStack.writeToNBT(new NBTTagCompound()));
 		this.NBTTC = NBTTC;
@@ -144,8 +141,8 @@ public class TileEntityLargeSign extends TileEntity {
 	}
 	
 	//for Sub Block or Item
-	public void setTheMetadata(int Metadata) {
-		this.theMetadata = Metadata;
+	public void setTheMetadata(int meta) {
+		this.theMetadata = meta;
 	}
 
 	public ItemStack getItemStack() {

@@ -12,7 +12,7 @@ public class ModTileEntitys {
 	public static void register(){
 		
 		ClientRegistry.registerTileEntity(tileEntityLargeSign,
-				RegistryName.TileEntityLargeSign,
+				NameManager.Registry.TileEntityLargeSign,
 				new TileEntityLargeSignRenderer());
 	}
 }

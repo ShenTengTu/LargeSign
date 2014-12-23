@@ -4,15 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiTextField;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import org.apache.commons.lang3.text.StrBuilder;
 
 import com.roripantsu.common.ModI18n;
 import com.roripantsu.guilib.GuiMainScreen;
 import com.roripantsu.guilib.GuiSubScreen;
-
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
  *Sub Gui Screen of Large Sign Editor
@@ -179,7 +178,7 @@ public class CustomGuiTextAndFontStyleEditor extends GuiSubScreen {
 				new GuiButton(id + 6,this.GroupX+fixW(this.gridWidth*54), this.GroupY+fixH(this.gridHeight*3) ,fixW(this.gridWidth*9),20, resetAll));
 		this.parentButtonList.addAll(this.buttonList);
 		
-		this.editTextField = new GuiTextField(this.fontRendererObj,
+		this.editTextField = new GuiTextField(id,this.fontRendererObj,
 				this.GroupX, this.GroupY+fixH(this.gridHeight*14), this.width, fixH(this.gridHeight*5));
 		this.editTextField.setMaxStringLength(256);
 		
