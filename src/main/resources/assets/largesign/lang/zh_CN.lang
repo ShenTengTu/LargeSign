@@ -1,11 +1,11 @@
-itemGroup.tab_modRoriPantsu=RoriPantsu的大型告示牌
+itemGroup.tab_LargeSign=大型告示牌
 
-tile.Block_LargeSign_oak.name=大型告示牌<橡木>
-tile.Block_LargeSign_spruce.name=大型告示牌<云杉木>
-tile.Block_LargeSign_birch.name=大型告示牌<白桦木>
-tile.Block_LargeSign_jungle.name=大型告示牌<丛林木>
-tile.Block_LargeSign_acacia.name=大型告示牌<金合欢木>
-tile.Block_LargeSign_dark_oak.name=大型告示牌<深色橡木>
+item.Item_LargeSign_Oak.name=大型告示牌<橡木>
+item.Item_LargeSign_Spruce.name=大型告示牌<云杉木>
+item.Item_LargeSign_Birch.name=大型告示牌<白桦木>
+item.Item_LargeSign_Jungle.name=大型告示牌<丛林木>
+item.Item_LargeSign_Acacia.name=大型告示牌<金合欢木>
+item.Item_LargeSign_Dark_Oak.name=大型告示牌<深色橡木>
 
 gui.CustomGuiColorSwitcher.title=选择颜色:
 gui.CustomGuiIconList.prev=上一页

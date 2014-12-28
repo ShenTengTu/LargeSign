@@ -5,11 +5,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -18,13 +16,10 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.roripantsu.common.ModI18n;
-import com.roripantsu.common.network.PacketPipeline;
 import com.roripantsu.guilib.GuiMainScreen;
-import com.roripantsu.largesign.blocks.Block_LargeSign;
+import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
-import com.roripantsu.largesign.packet.SPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
-import com.roripantsu.largesign.tileentity.TileEntityLargeSignRenderer;
 
 /**
  *Main Gui Screen of Large Sign Editor
@@ -33,17 +28,16 @@ import com.roripantsu.largesign.tileentity.TileEntityLargeSignRenderer;
 @SideOnly(Side.CLIENT)
 public class GuiEditLargeSign extends GuiMainScreen {
 
-	Minecraft MC = Minecraft.getMinecraft();
 	private GuiButton doneBtn;
 	private GuiButton textModeBtn;
 	private GuiButton itemModeBtn;
-	private CustomGuiTextAndFontStyleEditor fontStyleChooser;
-	private CustomGuiPositonAndScaleAdjustor Adjuter;
-	private CustomGuiColorSwitcher colorChooser;
-	private CustomGuiIconList iconList;
+	//private CustomGuiTextAndFontStyleEditor fontStyleChooser;
+	//private CustomGuiPositonAndScaleAdjustor Adjuter;
+	//private CustomGuiColorSwitcher colorChooser;
+	//private CustomGuiIconList iconList;
 	private TileEntityLargeSign tileLargeSign;
 	private int modeNumber;
-	GuiButton selectedButton;
+	//GuiButton selectedButton;
 	
 	//Localize Gui-->
 	private String guiName=this.getClass().getSimpleName();
@@ -54,33 +48,37 @@ public class GuiEditLargeSign extends GuiMainScreen {
 	
 	public GuiEditLargeSign(TileEntityLargeSign tileEntity) {
 		this.tileLargeSign = tileEntity;
-		((TileEntityLargeSignRenderer)TileEntityRendererDispatcher.instance
-		.getSpecialRenderer(this.tileLargeSign)).showWarning=false;
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float par3) {
+	public void drawScreen(int mouseX, int mouseY, float tick) {
 		this.drawDefaultBackground();
 		this.drawLargeSign();
 		this.drawHorizontalLine(0, this.width, this.height / 32 * 4+4, new Color(
 				255, 255, 255, 128).getRGB());
 		
-		this.fontStyleChooser.drawScreen(mouseX, mouseY, par3);
-		this.Adjuter.drawScreen(mouseX, mouseY, par3);
-		this.colorChooser.drawScreen(mouseX, mouseY, par3);
-		this.iconList.drawScreen(mouseX, mouseY, par3);
-		if(this.modeNumber==1 && this.iconList.selectedItemStack != null)
-			this.drawCenteredString(fontRendererObj,
-					this.iconList.selectedItemStack.getDisplayName(), 
-					this.width/2, this.gridHeight*50, 16777215);
-		super.drawScreen(mouseX, mouseY, par3);//draw all GuiButton and GuiLabel
-		this.iconList.renderButtonHoveringText(mouseX, mouseY);
+		super.drawScreen(mouseX, mouseY, tick);//draw all GuiButton and GuiLabel
+		
+		if(this.modeNumber==0){
+			/*this.fontStyleChooser.drawScreen(mouseX, mouseY, tick);
+			this.Adjuter.drawScreen(mouseX, mouseY, tick);
+			this.colorChooser.drawScreen(mouseX, mouseY, tick);*/
+		}
+		if(this.modeNumber==1){
+			/*this.iconList.drawScreen(mouseX, mouseY, tick);
+			if(this.iconList.selectedItemStack != null)
+				this.drawCenteredString(fontRendererObj,
+						this.iconList.selectedItemStack.getDisplayName(), 
+						this.width/2, this.gridHeight*50, 16777215);
+			this.iconList.renderButtonHoveringText(mouseX, mouseY);*/
+		}	
+		
 	}
 
 	@Override
 	protected void keyTyped(char character, int code) {
-		this.colorChooser.keyTyped(character, code);
-		this.fontStyleChooser.keyTyped(character, code);
+		/*this.colorChooser.keyTyped(character, code);
+		this.fontStyleChooser.keyTyped(character, code);*/
 
 		if (code == 1) {
 			this.actionPerformed(this.doneBtn);
@@ -89,13 +87,13 @@ public class GuiEditLargeSign extends GuiMainScreen {
 	
 	@Override
 	protected void mouseClicked(int x, int y, int buttonClicked) throws IOException {
-		this.fontStyleChooser.mouseClicked(x, y, buttonClicked);
-		this.colorChooser.mouseClicked(x, y, buttonClicked);
+		/*this.fontStyleChooser.mouseClicked(x, y, buttonClicked);
+		this.colorChooser.mouseClicked(x, y, buttonClicked);*/
 		super.mouseClicked(x, y, buttonClicked);//for all button.
 	}
 	  
 	protected void mouseClickMove(int mouseX, int mouseY, int lastButtonClicked, long  timeSinceMouseClick) {
-		this.Adjuter.mouseClickMove(mouseX, mouseY, lastButtonClicked, timeSinceMouseClick);
+		//this.Adjuter.mouseClickMove(mouseX, mouseY, lastButtonClicked, timeSinceMouseClick);
 	}
 	
 	/**
@@ -104,10 +102,10 @@ public class GuiEditLargeSign extends GuiMainScreen {
 	@Override
 	protected void actionPerformed(GuiButton button) {
 		if (button.enabled) {
-			this.fontStyleChooser.actionPerformed(button);
+			/*this.fontStyleChooser.actionPerformed(button);
 			this.Adjuter.actionPerformed(button);
 			this.colorChooser.actionPerformed(button);
-			this.iconList.actionPerformed(button);
+			this.iconList.actionPerformed(button);*/
 
 			if (button.id == 0) {
 				this.tileLargeSign.markDirty();
@@ -133,7 +131,7 @@ public class GuiEditLargeSign extends GuiMainScreen {
 
 		this.allowUserInput = true;
 		Keyboard.enableRepeatEvents(true);
-		if (!this.MC.gameSettings.forceUnicodeFont) {
+		if (!this.mc.gameSettings.forceUnicodeFont) {
 			this.fontRendererObj.setUnicodeFlag(true);
 			this.fontRendererObj.setBidiFlag(true);
 		}
@@ -146,7 +144,7 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		this.buttonList.add(this.itemModeBtn = 
 				new GuiButton(2,fixW(this.gridWidth*14), fixH(this.gridHeight*2), fixW(this.gridWidth*12),20, itemIconMode));
 		
-		this.fontStyleChooser = 
+		/*this.fontStyleChooser = 
 				new CustomGuiTextAndFontStyleEditor(3,this.mc,this.fontRendererObj,this,
 						fixW(this.gridWidth*4),fixH(this.gridHeight*50),fixW(this.gridWidth*63),fixH(this.gridHeight*19));
 		this.fontStyleChooser.initGui();
@@ -161,7 +159,7 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		this.iconList = 
 				new CustomGuiIconList(this.colorChooser.getLastID()+1,this.mc,this.fontRendererObj,this,
 						fixW(this.gridWidth*45),fixH(this.gridHeight*15),fixW(this.gridWidth*25),fixH(this.gridHeight*59));
-		this.iconList.initGui();
+		this.iconList.initGui();*/
 		
 		this.tileLargeSign.setEditable(false);
 		modeChange(this.modeNumber);
@@ -169,72 +167,72 @@ public class GuiEditLargeSign extends GuiMainScreen {
 
 	@Override
 	public void updateScreen() {
-		this.fontStyleChooser.updateScreen();
-		this.colorChooser.updateScreen();
-		this.tileLargeSign.largeSignText[0] = this.fontStyleChooser
-				.formatStringChange(this.fontStyleChooser.editTextField
-						.getText());
-		this.tileLargeSign.largeSignTextColor = this.colorChooser.ColorObj
-				.getRGB();
+		
 		this.tileLargeSign.modeNumber = this.modeNumber;
-		this.tileLargeSign.itemID = this.iconList.selectedItemID;
-		this.tileLargeSign.itemMetadata = this.iconList.selectedItemMatadata;
-		this.tileLargeSign.hasShadow = CustomGuiTextAndFontStyleEditor.FontStyles.SHADOW.enable;
-		this.tileLargeSign.scaleAdjust = this.Adjuter.adjust[0];
-		this.tileLargeSign.XAdjust = this.Adjuter.adjust[1];
-		this.tileLargeSign.YAdjust = this.Adjuter.adjust[2];
-		if(this.iconList.selectedItemStack!=null)
-			this.tileLargeSign.setItemStack(this.iconList.selectedItemStack);
+		if(this.modeNumber == 0){
+			/*this.fontStyleChooser.updateScreen();
+			this.colorChooser.updateScreen();
+			this.tileLargeSign.largeSignText[0] = 
+					this.fontStyleChooser.formatStringChange(this.fontStyleChooser.editTextField.getText());
+			this.tileLargeSign.largeSignTextColor = this.colorChooser.ColorObj.getRGB();
+			this.tileLargeSign.hasShadow = CustomGuiTextAndFontStyleEditor.FontStyles.SHADOW.enable;
+			this.tileLargeSign.scaleAdjust = this.Adjuter.adjust[0];
+			this.tileLargeSign.XAdjust = this.Adjuter.adjust[1];
+			this.tileLargeSign.YAdjust = this.Adjuter.adjust[2];*/
+		}
+		
+		if(this.modeNumber == 1){
+			/*if(this.iconList.selectedItemStack!=null)
+				this.tileLargeSign.setItemStack(this.iconList.selectedItemStack);*/
+		}
 	}
 
 	@Override
 	public void onGuiClosed() {
 		Keyboard.enableRepeatEvents(false);
-		if (!this.MC.gameSettings.forceUnicodeFont) {
+		if (!this.mc.gameSettings.forceUnicodeFont) {
 			this.fontRendererObj.setUnicodeFlag(false);
 			this.fontRendererObj.setBidiFlag(false);
 		}
 
 		CPacketUpdateLargeSign thePacketC = 
 				new CPacketUpdateLargeSign(this.tileLargeSign);
-		SPacketUpdateLargeSign thePacketS = 
-				new SPacketUpdateLargeSign(this.tileLargeSign);
+		/*SPacketUpdateLargeSign thePacketS = 
+				new SPacketUpdateLargeSign(this.tileLargeSign);*/
 
 		try {
-			List<Object> list = new LinkedList<Object>();
-			PacketPipeline.instance().encode(thePacketC, list);
-			PacketPipeline.instance().encode(thePacketS, list);
+			List<FMLProxyPacket> list = new LinkedList<FMLProxyPacket>();
+			Mod_LargeSign.packetPipeline.encode(thePacketC, list);
+			/*PacketPipeline.instance().encode(thePacketS, list);*/
 			FMLProxyPacket pktC = (FMLProxyPacket) list.get(0);
-			FMLProxyPacket pktS = (FMLProxyPacket) list.get(1);
-			PacketPipeline.instance().sendToServer(pktC);
-			PacketPipeline.instance().sendToAll(pktS);
+			/*FMLProxyPacket pktS = (FMLProxyPacket) list.get(1);*/
+			Mod_LargeSign.packetPipeline.sendToServer(pktC);
+			/*PacketPipeline.instance().sendToAll(pktS);*/
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		this.tileLargeSign.setEditable(true);
-		((TileEntityLargeSignRenderer)TileEntityRendererDispatcher.instance
-		.getSpecialRenderer(this.tileLargeSign)).showWarning=true;
 	}
 	
 	private void modeChange(int i) {
 
 		switch (i) {
 		case 0:
-			this.Adjuter.setVisible(true);
+			/*this.Adjuter.setVisible(true);
 			this.colorChooser.setVisible(true);
 			this.fontStyleChooser.setVisible(true);
-			this.iconList.setVisible(false);
+			this.iconList.setVisible(false);*/
 			this.textModeBtn.enabled=false;
 			this.itemModeBtn.enabled=true;
 
 			break;
 		case 1:
-			this.Adjuter.setVisible(false);
+			/*this.Adjuter.setVisible(false);
 			this.colorChooser.setVisible(false);
 			this.fontStyleChooser.setVisible(false);
-			this.iconList.setVisible(true);
+			this.iconList.setVisible(true);*/
 			this.textModeBtn.enabled=true;
 			this.itemModeBtn.enabled=false;
 
@@ -246,9 +244,7 @@ public class GuiEditLargeSign extends GuiMainScreen {
 
 		float SizePercent = 85F;
 		float angle = 0.0F;
-		EnumFacing k = (EnumFacing)this.mc.theWorld
-				.getBlockState(this.tileLargeSign.getPos())
-				.getValue(Block_LargeSign.PROP_FACING);
+		int k = this.tileLargeSign.getBlockMetadata();
 		
 		
 		GL11.glPushMatrix();
@@ -257,13 +253,13 @@ public class GuiEditLargeSign extends GuiMainScreen {
 		GL11.glScalef(-SizePercent, -SizePercent, -SizePercent);
 		GL11.glRotatef(180.0F, 0.0F, 1.0F, 0.0F);
 
-		if (k == EnumFacing.NORTH)
+		if (k == 2)
 			angle = 180.0F;
 
-		if (k == EnumFacing.WEST)
+		if (k == 4)
 			angle = 90.0F;
 
-		if (k == EnumFacing.EAST)
+		if (k == 5)
 			angle = -90.0F;
 
 		GL11.glRotatef(angle, 0.0F, 1.0F, 0.0F);

@@ -4,19 +4,14 @@ import java.awt.Color;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 /**
  *Custom Button for rendering color and icon
@@ -39,22 +34,34 @@ public class CustomGuiButton extends GuiButton {
 	private Color color;
 	private ItemStack itemStack;
 	private ButtonFrontStyle frontStyle;
-	private RenderItem renderItem = new RenderItem(mc.getTextureManager(),new ModelManager(mc.getTextureMapBlocks()));
+	private RenderItem renderItem = mc.getRenderItem();
+	private int ltX;
+	private int ltY;
+	private int rbX;
+	private int rbY;
 	
 	/**
 	 *For color block button.
 	 */
 	public CustomGuiButton(int ID, int X, int Y, int W, int H,Color color) {
 		super(ID, X, Y, W, H, "");
-			this.color = color;
-			this.frontStyle=ButtonFrontStyle.COLORBLOCK;
+		this.ltX = X;
+		this.ltY = Y;
+		this.rbX = X+W-1;
+		this.rbY = Y+H-1;
+		this.color = color;
+		this.frontStyle=ButtonFrontStyle.COLORBLOCK;
 	}
 	
 	/**
 	 *For common button.
 	 */
 	public CustomGuiButton(int ID, int X, int Y, int W, int H,String text) {
-		super(ID, X, Y, W, H, text);	
+		super(ID, X, Y, W, H, text);
+		this.ltX = X;
+		this.ltY = Y;
+		this.rbX = X+W-1;
+		this.rbY = Y+H-1;
 		this.frontStyle=ButtonFrontStyle.TEXT;
 	}
 	
@@ -63,8 +70,12 @@ public class CustomGuiButton extends GuiButton {
 	 */
 	public CustomGuiButton(int ID, int X, int Y, int W, int H,ItemStack itemStack) {
 		super(ID, X, Y, W, H, "");
-			this.itemStack = itemStack;
-			this.frontStyle=ButtonFrontStyle.ITEMICON;
+		this.ltX = X;
+		this.ltY = Y;
+		this.rbX = X+W-1;
+		this.rbY = Y+H-1;
+		this.itemStack = itemStack;
+		this.frontStyle=ButtonFrontStyle.ITEMICON;
 	}
 	
 	/**
@@ -72,41 +83,26 @@ public class CustomGuiButton extends GuiButton {
 	 */
 	public CustomGuiButton(int ID, int X, int Y, int W, int H,ItemStack itemStack,String text) {
 		super(ID, X, Y, W, H, text);
-			this.itemStack =itemStack;
-			this.frontStyle=ButtonFrontStyle.ITEMICON_TEXT;
+		this.ltX = X;
+		this.ltY = Y;
+		this.rbX = X+W-1;
+		this.rbY = Y+H-1;
+		this.itemStack =itemStack;
+		this.frontStyle=ButtonFrontStyle.ITEMICON_TEXT;
 	}
 	
-	/**
-	 * For custom icon button 
-	 */
-	/*public CustomGuiButton(int ID, int X, int Y, int W, int H,IIcon icon) {
-		super(ID, X, Y, W, H, "");
-			this.icon = icon;
-			this.frontStyle=ButtonFrontStyle.ICON;
-	}*/
-	
-	/**
-	 * For text button with custom icon. 
-	 */
-	/*public CustomGuiButton(int ID, int X, int Y, int W, int H,IIcon icon,String text) {
-		super(ID, X, Y, W, H, text);
-		this.icon = icon;
-		this.frontStyle=ButtonFrontStyle.ICON_TEXT;
-	}*/
-
-
 	@Override
-	public void drawButton(Minecraft MC, int X, int Y) {
+	public void drawButton(Minecraft MC, int mouseX, int mouseY) {
 		if (this.visible) {
 						
 			if (frontStyle == ButtonFrontStyle.COLORBLOCK)
-				this.drawColorBlockButton(MC, X, Y);
+				this.drawColorBlockButton(MC, mouseX, mouseY);
 			
 			if (frontStyle == ButtonFrontStyle.TEXT)
-				super.drawButton(MC, X, Y);
+				super.drawButton(MC, mouseX, mouseY);
 			
 			if (frontStyle == ButtonFrontStyle.ITEMICON)
-				this.drawItemIconButton(MC, X, Y);
+				this.drawItemIconButton(MC, mouseX, mouseY);
 
 			if (frontStyle == ButtonFrontStyle.ITEMICON_TEXT){
 
@@ -115,34 +111,24 @@ public class CustomGuiButton extends GuiButton {
 		}
 	}
 
-	private void drawColorBlockButton(Minecraft MC, int X, int Y) {
-		//field_146123_n == isHover
-		this.hovered = X >= this.xPosition && Y >= this.yPosition
-				&& X < this.xPosition + this.width
-				&& Y < this.yPosition + this.height;
-		
+	private void drawColorBlockButton(Minecraft MC, int mouseX, int mouseY) {
+		this.hovered = this.getHorverd(mouseX,mouseY);
 		int k = this.getHoverState(this.hovered);
 		Color quadColor=new Color(225,225,225, 32 * k);
-		this.renderQuad(this.xPosition, this.yPosition, this.xPosition
-				+ this.width, this.yPosition + this.height, quadColor);
-		
-		this.renderQuad(this.xPosition + 1, this.yPosition + 1, this.xPosition
-				+ this.width - 1, this.yPosition + this.height - 1, this.color);
+		Gui.drawRect(ltX, ltY, rbX, rbY, quadColor.getRGB());
+		Gui.drawRect(ltX+1, ltY+1, rbX-1, rbY-1,  this.color.getRGB());
 	}
 
-	private void drawItemIconButton(Minecraft MC, int X, int Y) {
+	private void drawItemIconButton(Minecraft MC, int mouseX, int mouseY) {
 		
-		
-		//field_146123_n == isHover
-		this.hovered = X >= this.xPosition && Y >= this.yPosition
-				&& X < this.xPosition + this.width
-				&& Y < this.yPosition + this.height;
-		
+		this.hovered = this.getHorverd(mouseX,mouseY);
 		int k = this.getHoverState(this.hovered);
 		Color quadColor=new Color(225,225,225, 32 * k);
-		this.renderQuad(this.xPosition, this.yPosition, this.xPosition
-				+ this.width, this.yPosition + this.height, quadColor);
-
+		
+		GlStateManager.disableLighting();
+        GlStateManager.color(1F, 1F, 1F);
+        GlStateManager.enableBlend();
+		Gui.drawRect(ltX, ltY, rbX, rbY, quadColor.getRGB());
 		this.renderItemIcon(MC.fontRendererObj, MC.getTextureManager(),
 				this.itemStack, this.xPosition + (this.width - 16) / 2,
 				this.yPosition + (this.height - 16) / 2);
@@ -153,38 +139,21 @@ public class CustomGuiButton extends GuiButton {
 			TextureManager textureManager, final ItemStack itemStack, int X,
 			int Y) {
 
-		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-		RenderHelper.enableGUIStandardItemLighting();
-		/*this.renderItem.renderItemAndEffectIntoGUI(fontRenderer,
-				textureManager, itemStack, X, Y);*/
-		this.renderItem.func_175030_a(fontRenderer,itemStack, X, Y);
-		RenderHelper.disableStandardItemLighting();
-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-
+		  	this.zLevel = 100.0F;
+	        this.renderItem.zLevel = 100.0F;
+	        GlStateManager.enableLighting();
+	        GlStateManager.enableRescaleNormal();
+	        this.renderItem.func_180450_b(itemStack, X, Y);
+	        this.renderItem.func_175030_a(fontRenderer,itemStack, X, Y);
+	        GlStateManager.disableLighting();
+	        this.renderItem.zLevel = 0.0F;
+	        this.zLevel = 0.0F;
 	}
-	
-    private void renderQuad(int X, int Y, int W, int H, Color color) {
-		Tessellator tessellator = Tessellator.getInstance();
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glDisable(GL11.GL_DEPTH_TEST);
-		GL11.glDisable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_ALPHA_TEST);
-		GL11.glEnable(GL11.GL_BLEND);
-		OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-		GL11.glColor4f(color.getRed() / 225F, color.getGreen() / 225F,
-				color.getBlue() / 225F, color.getAlpha() / 225F);
-		tessellator.getWorldRenderer().startDrawingQuads();
-		tessellator.getWorldRenderer().addVertex(X, H, 0.0D);
-		tessellator.getWorldRenderer().addVertex(W, H, 0.0D);
-		tessellator.getWorldRenderer().addVertex(W, Y, 0.0D);
-		tessellator.getWorldRenderer().addVertex(X, Y, 0.0D);
-		tessellator.draw();
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_ALPHA_TEST);
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-	}
+	 
+    private boolean getHorverd(int mouseX, int mouseY){
+    	return mouseX >= this.ltX && mouseY >= this.ltY
+    			&& mouseX <= this.rbX && mouseY <= this.rbY;
+    }
     
 	public Color getColor() {
 		return color;

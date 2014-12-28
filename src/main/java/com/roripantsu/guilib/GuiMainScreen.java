@@ -59,6 +59,12 @@ public class GuiMainScreen extends GuiScreen {
 		
 	}
 	
+	//for resize
+	@Override
+    public void func_175273_b(Minecraft MC, int width,int height){
+        this.setWorldAndResolution(MC, width, height);
+    }
+	
 	/**
 	 * 
 	 * @return GuiButtton list of this screen.

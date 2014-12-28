@@ -4,61 +4,32 @@ import java.io.IOException;
 
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.roripantsu.common.network.NetHandlerPlayClientSide;
-import com.roripantsu.common.network.ServerPacket;
+import com.roripantsu.common.network.ModServerPostPacket;
+import com.roripantsu.largesign.network.NetHandlerPlayClientSide;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 /**
  *the packet which handle command for opening Large Sign editor
  *@author ShenTeng Tu(RoriPantsu)
  */
-public class SPacketLargeSignEditorOpen extends ServerPacket {
+public class SPacketLargeSignEditorOpen extends ModServerPostPacket {
 
-	private int xCoordinate;
-	private int yCoordinate;
-	private int zCoordinate;
-	private int theMetadata;////for Sub Block or Item
-	private EnumFacing side;
-
-	public SPacketLargeSignEditorOpen() {
-	}
+	private BlockPos blockPos;
+	
+	//for Class.newInstance()
+	public SPacketLargeSignEditorOpen() {}
 
 	public SPacketLargeSignEditorOpen(TileEntityLargeSign tileEntity) {
-		this.xCoordinate = tileEntity.getPos().getX();
-		this.yCoordinate = tileEntity.getPos().getY();
-		this.zCoordinate = tileEntity.getPos().getZ();
-		this.theMetadata=tileEntity.getTheMetadata();//for Sub Block or Item
-		this.side=tileEntity.getSide();
+		this.blockPos = tileEntity.getPos();
 	}
 
 	@SideOnly(Side.CLIENT)
-	public int getXCoordinate() {
-		return this.xCoordinate;
-	}
-
-	@SideOnly(Side.CLIENT)
-	public int getYCoordinate() {
-		return this.yCoordinate;
-	}
-
-	@SideOnly(Side.CLIENT)
-	public int getZCoordinate() {
-		return this.zCoordinate;
-	}
-	
-	//for Sub Block or Item
-	@SideOnly(Side.CLIENT)
-	public int getTheMetadata() {
-		return theMetadata;
-	}
-	
-	@SideOnly(Side.CLIENT)
-	public EnumFacing getSide() {
-		return side;
+	public BlockPos getBlockPos() {
+		return blockPos;
 	}
 
 	@Override
@@ -68,21 +39,15 @@ public class SPacketLargeSignEditorOpen extends ServerPacket {
 
 	@Override
 	public void readPacketData(PacketBuffer buffer) throws IOException {
-		this.xCoordinate = buffer.readInt();
-		this.yCoordinate = buffer.readInt();
-		this.zCoordinate = buffer.readInt();
-		this.theMetadata=buffer.readInt();//for Sub Block or Item
-		this.side=EnumFacing.getHorizontal(buffer.readInt());
-		
+		this.blockPos = new BlockPos(buffer.readInt(),buffer.readInt(),buffer.readInt());
+
 	}
 
 	@Override
 	public void writePacketData(PacketBuffer buffer) throws IOException {
-		buffer.writeInt(this.xCoordinate);
-		buffer.writeInt(this.yCoordinate);
-		buffer.writeInt(this.zCoordinate);
-		buffer.writeInt(this.theMetadata);//for Sub Block or Item
-		buffer.writeInt(this.side.getHorizontalIndex());
+		buffer.writeInt(this.blockPos.getX());
+		buffer.writeInt(this.blockPos.getY());
+		buffer.writeInt(this.blockPos.getZ());
 	}
 
 	@Override

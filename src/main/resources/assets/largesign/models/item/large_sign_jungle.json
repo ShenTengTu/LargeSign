@@ -1,0 +1,4 @@
+{
+"parent":"largesign:item/large_sign",
+"textures":{"material":"largesign:items/item_large_sign_jungle"}
+}

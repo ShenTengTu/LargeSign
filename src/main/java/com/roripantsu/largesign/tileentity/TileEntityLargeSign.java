@@ -1,5 +1,6 @@
 package com.roripantsu.largesign.tileentity;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -8,9 +9,11 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.roripantsu.largesign.blocks.Block_LargeSign;
+import com.roripantsu.largesign.manager.ModBlocks;
 
 /**
  *Tile entity of Large Sign
@@ -19,8 +22,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class TileEntityLargeSign extends TileEntity {
 
 	public boolean hasShadow = false;
-	public int itemID = 1;
-	public int itemMetadata = 0;
 	public String[] largeSignText = new String[] { "" };
 	public int largeSignTextColor = -2039584;
 	public int modeNumber = 0;
@@ -31,9 +32,12 @@ public class TileEntityLargeSign extends TileEntity {
 	private boolean Editable = true;
 	private EntityPlayer entityPlayer;
 	private NBTTagCompound NBTTC = new NBTTagCompound();
-	private int theMetadata=0;//for Sub Block or Item
-	private EnumFacing side;
 	private ItemStack itemStack;
+	
+	
+	public TileEntityLargeSign() {
+		this.blockType=ModBlocks.LargeSign;
+	}
 
 	@Override
 	public Packet getDescriptionPacket() {
@@ -54,14 +58,6 @@ public class TileEntityLargeSign extends TileEntity {
 		return this.Editable;
 	}
 
-	public EnumFacing getSide() {
-		return this.side;
-	}
-
-	public void setSide(EnumFacing side) {
-		this.side = side;
-	}
-
 	@Override
 	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
 			
@@ -76,10 +72,7 @@ public class TileEntityLargeSign extends TileEntity {
 	public void readFromNBT(NBTTagCompound NBTTC) {
 		this.Editable = false;
 		super.readFromNBT(NBTTC);
-		this.theMetadata=NBTTC.getInteger("theMetadata");//for Sub Block or Item
 		this.modeNumber = NBTTC.getInteger("modeNumber");
-		this.itemID = NBTTC.getInteger("itemID");
-		this.itemMetadata = NBTTC.getInteger("itemMetadata");
 		this.largeSignTextColor = NBTTC.getInteger("largeSignTextColor");
 		this.hasShadow = NBTTC.getBoolean("hasShadow");
 		this.largeSignText[0] = NBTTC.getString("largeSignText");
@@ -87,7 +80,6 @@ public class TileEntityLargeSign extends TileEntity {
 		this.YAdjust = NBTTC.getFloat("YAdjust");
 		this.rotate = NBTTC.getFloat("rotate");
 		this.scaleAdjust = NBTTC.getFloat("scaleAdjust");
-		this.side=EnumFacing.getHorizontal(NBTTC.getInteger("side"));
 		if(NBTTC.hasKey("itemStack"))
 			this.itemStack=ItemStack.loadItemStackFromNBT(NBTTC.getCompoundTag("itemStack"));
 		this.NBTTC = NBTTC;
@@ -114,37 +106,20 @@ public class TileEntityLargeSign extends TileEntity {
 	@Override
 	public void writeToNBT(NBTTagCompound NBTTC) {
 		
-		NBTTC.setString("id", TileEntityLargeSign.class.getSimpleName());
-		NBTTC.setInteger("x", this.pos.getX());
-		NBTTC.setInteger("y", this.pos.getY());
-		NBTTC.setInteger("z", this.pos.getZ());
-		NBTTC.setInteger("theMetadata", this.theMetadata);//for Sub Block or Item
+		super.writeToNBT(NBTTC);
 		NBTTC.setInteger("modeNumber", this.modeNumber);
 		NBTTC.setInteger("largeSignTextColor", this.largeSignTextColor);
-		NBTTC.setInteger("itemID", this.itemID);
-		NBTTC.setInteger("itemMetadata", this.itemMetadata);
 		NBTTC.setBoolean("hasShadow", this.hasShadow);
 		NBTTC.setFloat("XAdjust", this.XAdjust);
 		NBTTC.setFloat("YAdjust", this.YAdjust);
 		NBTTC.setFloat("scaleAdjust", this.scaleAdjust);
 		NBTTC.setFloat("rotate", this.rotate);
 		NBTTC.setString("largeSignText", this.largeSignText[0]);
-		NBTTC.setInteger("side",this.side.getHorizontalIndex());
 		if(this.itemStack!=null)
 			NBTTC.setTag("itemStack", this.itemStack.writeToNBT(new NBTTagCompound()));
 		this.NBTTC = NBTTC;
 	}
 	
-	//for Sub Block or Item
-	public int getTheMetadata() {
-		return this.theMetadata;
-	}
-	
-	//for Sub Block or Item
-	public void setTheMetadata(int meta) {
-		this.theMetadata = meta;
-	}
-
 	public ItemStack getItemStack() {
 		return itemStack;
 	}
@@ -152,5 +127,19 @@ public class TileEntityLargeSign extends TileEntity {
 	public void setItemStack(ItemStack itemStack) {
 		this.itemStack = itemStack;
 	}
+	
+	@Override
+    public boolean canRenderBreaking()
+    {
+        Block block = this.getBlockType();
+        
+        return super.canRenderBreaking() || block instanceof Block_LargeSign;
+    }
+	
+	@Override
+    public void updateContainingBlockInfo()
+    {
+		this.blockType=ModBlocks.LargeSign;
+    }
 
 }

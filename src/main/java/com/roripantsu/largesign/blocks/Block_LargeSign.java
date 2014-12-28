@@ -1,5 +1,6 @@
 package com.roripantsu.largesign.blocks;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -26,15 +27,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.manager.ETextureResource;
-import com.roripantsu.largesign.manager.NameManager;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 /**
  *Block class of Large Sign,some methods content same as BlockSign.
- *Original block metadata represent sides of block.
- *"TheMetadata" represent id of sub blocks.
  *@author ShenTeng Tu(RoriPantsu)
  */
 public class Block_LargeSign extends BlockContainer {
@@ -43,50 +40,45 @@ public class Block_LargeSign extends BlockContainer {
 
 	
 	//for Sub Block or Item>>
-	public static final PropertyEnum PROP_SUB_TYPE = PropertyEnum.create("sub_type", Block_LargeSign.ESubType.class);
 	public static final PropertyDirection PROP_FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+	public static final PropertyEnum PROP_SUB_TYPE = PropertyEnum.create("sub_type", Block_LargeSign.ESubType.class);
     public static final String[] textureNames =ETextureResource.Enttity_large_sign.textureName;
     //<<for Sub Block or Item
     
 	public Block_LargeSign(Class<?> tileEntityLargeSign) {
 		super(Material.wood);
 		this.tileEntityClass = tileEntityLargeSign;
-		this.setHardness(1.0F);
-		this.setStepSound(soundTypeWood);
-		this.setCreativeTab(Mod_LargeSign.tab_modRoriPantsu);
-		this.setUnlocalizedName(NameManager.Unlocalized.BlockLargeSign);
-		
 		this.setDefaultState(this.blockState.getBaseState().withProperty(PROP_FACING, EnumFacing.NORTH));
-		//for Sub Block or Item
 		this.setDefaultState(this.blockState.getBaseState().withProperty(PROP_SUB_TYPE, Block_LargeSign.ESubType.OAK));
-		//this.setBlockTextureName(textureNames[0]);
+		this.disableStats();
 	}
 	
     /** create BlockState instance using IProperty array*/
-    //for Sub Block or Item
     @Override
     protected BlockState createBlockState(){
-        return new BlockState(this, new IProperty[] {PROP_SUB_TYPE,PROP_FACING});
+        return new BlockState(this, new IProperty[] {PROP_FACING,PROP_SUB_TYPE});
     }
-		
-    //for Sub Block or Item
+    
     @Override
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(PROP_SUB_TYPE, Block_LargeSign.ESubType.getType(meta));
+        EnumFacing enumfacing = EnumFacing.getFront(meta);
+
+        if (enumfacing.getAxis() == EnumFacing.Axis.Y)
+            enumfacing = EnumFacing.NORTH;
+
+        return this.getDefaultState().withProperty(PROP_FACING, enumfacing);
     }
     
-    
-    //for Sub Block or Item
     @Override
     public int getMetaFromState(IBlockState state){
-        return ((Block_LargeSign.ESubType)state.getValue(PROP_SUB_TYPE)).getSubID();
+        return ((EnumFacing)state.getValue(PROP_FACING)).getIndex();
     }
     
 	@Override
 	public TileEntity createNewTileEntity(World world, int meta) {
 		try {
 			TileEntityLargeSign tileEntity=(TileEntityLargeSign) this.tileEntityClass.newInstance();
-			tileEntity.setTheMetadata(meta);//for Sub Block or Item
+			tileEntity.setWorldObj(world);
 			return (TileEntity) tileEntity;
 		} catch (Exception exception) {
 			throw new RuntimeException(exception);
@@ -129,16 +121,18 @@ public class Block_LargeSign extends BlockContainer {
 	public void setBlockBoundsBasedOnState(IBlockAccess blockAccess, BlockPos pos) {
 
 		EnumFacing enumfacing = (EnumFacing)blockAccess.getBlockState(pos).getValue(PROP_FACING);
-		float thickness = 0.125F;
+		float thickness = 0.08F;
+		float width = 1F;
+		float height = 0.885F;
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 		if (enumfacing == EnumFacing.NORTH)
-			this.setBlockBounds(0.0F, 0.0F, 1.0F - thickness, 1.0F, 1.0F, 1.0F);
+			this.setBlockBounds(0.0F, 0.5F-height*0.5F, 1.0F - thickness, 1.0F, 0.5F+height*0.5F, width);
 		if (enumfacing == EnumFacing.SOUTH)
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, thickness);
+			this.setBlockBounds(0.0F, 0.5F-height*0.5F, 0.0F, width, 0.5F+height*0.5F, thickness);
 		if (enumfacing == EnumFacing.WEST)
-			this.setBlockBounds(1.0F - thickness, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
+			this.setBlockBounds(1.0F - thickness, 0.5F-height*0.5F, 0.0F, 1.0F, 0.5F+height*0.5F, width);
 		if (enumfacing == EnumFacing.EAST)
-			this.setBlockBounds(0.0F, 0.0F, 0.0F, thickness, 1.0F, 1.0F);
+			this.setBlockBounds(0.0F, 0.5F-height*0.5F, 0.0F, thickness,0.5F+height*0.5F, width);
 	}
 	
 	@Override
@@ -190,6 +184,8 @@ public class Block_LargeSign extends BlockContainer {
             this.dropBlockAsItem(world, pos, state, 0);
             world.setBlockToAir(pos);
         }
+        
+        super.onNeighborBlockChange(world, pos, state, theBlock);
 					
 	}
           
@@ -239,6 +235,13 @@ public class Block_LargeSign extends BlockContainer {
         	int i = MathHelper.clamp_int(subID, 0, values().length);
 
             return values()[i];
+        }
+        
+        public static String[] getNames(){
+        	List<String> list = new ArrayList<String>();
+        	for(ESubType e: values())
+        		list.add(e.name);
+        	return list.toArray(new String[list.size()]);
         }
         
 		@Override

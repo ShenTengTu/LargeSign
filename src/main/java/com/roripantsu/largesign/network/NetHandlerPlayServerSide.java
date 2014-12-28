@@ -1,4 +1,4 @@
-package com.roripantsu.common.network;
+package com.roripantsu.largesign.network;
 
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.NetHandlerPlayServer;
@@ -8,7 +8,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatAllowedCharacters;
 import net.minecraft.world.WorldServer;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.relauncher.Side;
 
+import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.packet.CPacketUpdateLargeSign;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
@@ -17,14 +20,22 @@ import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
  *@author ShenTeng Tu(RoriPantsu)
  */
 public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
-	private EntityPlayerMP playerEntity;
-	private MinecraftServer serverController;
 
-	public NetHandlerPlayServerSide(MinecraftServer serverController,
-			EntityPlayerMP playerEntity, NetworkManager networkManager) {
-		super(serverController, networkManager, playerEntity);
-		this.serverController = serverController;
-		this.playerEntity = playerEntity;
+	private static final MinecraftServer mcServer = MinecraftServer.getServer();
+	private static final NetworkManager networkManager;
+	private static final EntityPlayerMP playerEntity;
+	static{
+		NetHandlerPlayServer netHandler = 
+				(NetHandlerPlayServer) NetworkRegistry.INSTANCE
+				.getChannel(Mod_LargeSign.MODID, Side.SERVER)
+				.attr(NetworkRegistry.NET_HANDLER).get();
+		playerEntity = netHandler.playerEntity;
+		networkManager = netHandler.netManager;
+	}
+
+	public NetHandlerPlayServerSide() {
+		super(mcServer, networkManager, playerEntity);
+
 
 	}
 
@@ -33,16 +44,16 @@ public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
 	}
 
 	public MinecraftServer getServerController() {
-		return serverController;
+		return mcServer;
 	}
 
 	public void handleUpdateLargeSign(CPacketUpdateLargeSign thePacket) {
-		this.playerEntity.markPlayerActive();
-		WorldServer worldserver = this.serverController
-				.worldServerForDimension(this.playerEntity.dimension);
-		int x=thePacket.getXCoordinate();
-		int y=thePacket.getYCoordinate();
-		int z=thePacket.getZCoordinate();
+		playerEntity.markPlayerActive();
+		WorldServer worldserver = mcServer
+				.worldServerForDimension(playerEntity.dimension);
+		int x=thePacket.getBlockPos().getX();
+		int y=thePacket.getBlockPos().getY();
+		int z=thePacket.getBlockPos().getZ();
 		
 		//1.7.10 World.blockExists(int,int,int)
 		boolean isBlockExist = y >= 0 && y < 256 ? worldserver.chunkExists(x >> 4, z >> 4) : false;
@@ -54,9 +65,9 @@ public class NetHandlerPlayServerSide extends NetHandlerPlayServer {
 				TileEntityLargeSign tileEntityLargeSign = (TileEntityLargeSign) tileentity;
 
 				if (!tileEntityLargeSign.isEditable()
-						|| tileEntityLargeSign.getEntityPlayer() != this.playerEntity) {
-					this.serverController.logWarning("Player "
-							+ this.playerEntity.getName()
+						|| tileEntityLargeSign.getEntityPlayer() != playerEntity) {
+					mcServer.logWarning("Player "
+							+ playerEntity.getName()
 							+ " just tried to change non-editable sign");
 					return;
 				}

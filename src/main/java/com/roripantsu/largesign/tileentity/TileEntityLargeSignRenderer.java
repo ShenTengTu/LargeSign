@@ -1,7 +1,6 @@
 package com.roripantsu.largesign.tileentity;
 
-import java.util.List;
-
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
@@ -16,6 +15,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -26,6 +26,7 @@ import org.apache.commons.lang3.text.StrBuilder;
 import org.lwjgl.opengl.GL11;
 
 import com.roripantsu.common.BasePath;
+import com.roripantsu.largesign.blocks.Block_LargeSign;
 import com.roripantsu.largesign.gui.CustomGuiTextAndFontStyleEditor;
 import com.roripantsu.largesign.manager.ETextureResource;
 
@@ -51,8 +52,6 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 	private CustomFontRenderer fontrenderer;
 	private Minecraft MC = Minecraft.getMinecraft();
 	private final Model_LargeSign modelLargeSign = new Model_LargeSign();
-	private boolean multipleLine=false;
-	public boolean showWarning=true;
 	
 	@Override
 	public void renderTileEntityAt(TileEntity tileEntity, double render_xCoord,
@@ -65,26 +64,25 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 	void renderLargeSign(TileEntityLargeSign tileEntityLargeSign,
 			double render_xCoord, double render_yCoord, double render_zCoord,
 			float FL,int destoryStage) {
-
+		
+		IBlockState blockState = ((Block_LargeSign)tileEntityLargeSign.getBlockType()).getDefaultState();
+		EnumFacing side = (EnumFacing) blockState.getValue(Block_LargeSign.PROP_FACING);
+		Block_LargeSign.ESubType subType = (Block_LargeSign.ESubType) blockState.getValue(Block_LargeSign.PROP_SUB_TYPE);
 		int modeNumber = tileEntityLargeSign.modeNumber;
-		int side = tileEntityLargeSign.getBlockMetadata();
 		float modelRotate = tileEntityLargeSign.rotate;
 		
-		GL11.glPushMatrix();//1.8 GlStateManager.pushMatrix();
+		GlStateManager.pushMatrix();
 		float rotateAngle = 0.0F;
-		if (side == 2)
+		if (side == EnumFacing.NORTH)
 			rotateAngle = 180.0F;
-		if (side == 4)
+		if (side == EnumFacing.WEST)
 			rotateAngle = 90.0F;
-		if (side == 5)
+		if (side == EnumFacing.EAST)
 			rotateAngle = -90.0F;
 		
-		//1.8 GlStateManager.translate(float, float, float)
-		//1.8 GlStateManager.rotate(float, float, float, float)
-		GL11.glTranslatef((float) render_xCoord + 0.5F,
+		GlStateManager.translate((float) render_xCoord + 0.5F,
 				(float) render_yCoord + 0.5F, (float) render_zCoord + 0.5F);
-		GL11.glRotatef(-rotateAngle, 0.0F, 1.0F, 0.0F);
-		
+		GlStateManager.rotate(-rotateAngle, 0.0F, 1.0F, 0.0F);
 		
 		
         if (destoryStage >= 0){
@@ -96,32 +94,32 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
             GlStateManager.matrixMode(5888);
         }else{
 		//for Sub Block or Item
-        	int i = MathHelper.clamp_int(tileEntityLargeSign.getTheMetadata(), 0, textureLocation.length-1);
+        	int i = MathHelper.clamp_int(subType.getSubID(), 0, textureLocation.length-1);
         	this.bindTexture(this.completeResourceLocation(textureLocation[i]));
         }
 		
         GlStateManager.enableRescaleNormal();
-		GL11.glPushMatrix();
+        GlStateManager.pushMatrix();
 		float f1=1F;
 		float f2=(float) (1/Math.sqrt(2));
 		float f3=0.875F;
 		float[] xScale8Dir={f1,f2,f3,f2,f1,f2,f3,f2};
 		float[] yScale8Dir={-f3,-f2,-f1,-f2,-f3,-f2,-f1,-f2};
-		GL11.glScalef( xScale8Dir[(int) (modelRotate/45F)], yScale8Dir[(int) (modelRotate/45F)], -0.5F);
+		GlStateManager.scale( xScale8Dir[(int) (modelRotate/45F)], yScale8Dir[(int) (modelRotate/45F)], -0.5F);
 		this.modelLargeSign.setRotation(this.modelLargeSign.LargeSign, 0F, 0F, modelRotate/180F*(float)Math.PI);
 		this.modelLargeSign.renderLargeSign((Entity) null, 0.0F, 0.0F, 0.0F,
 				0.0F, 0.0F, 1 / 16F);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 
 		switch (modeNumber) {
 		case 0:
 			this.renderString(tileEntityLargeSign);
 			break;
 		case 1:
-			this.renderItemIcon(tileEntityLargeSign);
+			this.renderItemIcon(tileEntityLargeSign,side);
 			break;
 		}
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 		
         if (destoryStage >= 0)
         {
@@ -155,20 +153,15 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 	}
 	
 
-	private void renderItemIcon(TileEntityLargeSign tileEntity) {
+	private void renderItemIcon(TileEntityLargeSign tileEntity, EnumFacing side) {
 		
 		World world=tileEntity.getWorld();
 		int x=tileEntity.getPos().getX();
 		int y=tileEntity.getPos().getY();
 		int z=tileEntity.getPos().getZ();
-		
-		int direction=tileEntity.getSide().getHorizontalIndex();
+		int direction=side.getHorizontalIndex();
 		ItemStack itemStack = tileEntity.getItemStack();
-		
-		if(!tileEntity.getNBTTC().hasKey("itemStack")){
-			 itemStack=new ItemStack(Item.getItemById(tileEntity.itemID),1,tileEntity.itemMetadata);
-		}
-		
+			
 		if (itemStack != null){
             EntityItem entityitem = new EntityItem(world,0, 0, 0, itemStack);
             Item item = entityitem.getEntityItem().getItem();
@@ -214,17 +207,7 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
                 textureatlassprite.updateAnimation();
             } 
         }
-		
-		if(!tileEntity.getNBTTC().hasKey("itemStack") && showWarning ){
-			 GL11.glPushMatrix();
-			 GL11.glTranslated(0.0D, 0.2D, 0.5D);
-			 tileEntity.largeSignText[0]="This Icon Will Disappear In After Version."
-			 		+ "Please Replace And You Will Not See These Words.";
-			 multipleLine=true;
-			 this.renderString(tileEntity);
-			 multipleLine=false;
-			 GL11.glPopMatrix();
-		}
+
 	}
 	
     private void renderString(TileEntityLargeSign tileEntity) {
@@ -274,21 +257,9 @@ public class TileEntityLargeSignRenderer extends TileEntitySpecialRenderer {
 		GL11.glDepthMask(false);
 		GL11.glEnable(GL11.GL_BLEND);//?
 		
-		if(multipleLine){
-			List<String> list=this.fontrenderer.listFormattedStringToWidth(str, 80);
-			int c=0;
-			for(String s:list){
-			this.fontrenderer.drawString(s,
-					-stringWidth / 2.0F,
-					-4.5F+c, color, hasShadow);
-			c+=this.fontrenderer.FONT_HEIGHT;
-			}
-		}else{
 		this.fontrenderer.drawString(displayString,
 			-stringWidth / 2.0F + adjust[1],
 			-4.5F + adjust[2], color, hasShadow);
-		}
-
 
 		GL11.glDepthMask(true);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

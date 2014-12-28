@@ -6,53 +6,42 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.roripantsu.common.network.ClientPacket;
-import com.roripantsu.common.network.NetHandlerPlayServerSide;
+import com.roripantsu.common.network.ModClientPostPacket;
+import com.roripantsu.largesign.network.NetHandlerPlayServerSide;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
 /**
  *the packet which handle Updating Large Sign for client
  *@author ShenTeng Tu(RoriPantsu)
  */
-public class CPacketUpdateLargeSign extends ClientPacket {
+public class CPacketUpdateLargeSign extends ModClientPostPacket {
 
 	private NBTTagCompound mainNBTTC;
 	private boolean hasShadow;
-	private int itemID;
-	private int itemMetadata;
 	private int modeNumber;
 	private int theColor;
 	private String[] theString = new String[1];
-	private int xCoordinate;
-	private int yCoordinate;
-	private int zCoordinate;
-	private int side;
+	private BlockPos blockPos;
 	private ItemStack itemStack;
-
-	//for Server side
-	public CPacketUpdateLargeSign() {
-	}
 	
-	//for Client side
+	//for Class.newInstance()
+	public CPacketUpdateLargeSign() {}
+	
 	@SideOnly(Side.CLIENT)
 	public CPacketUpdateLargeSign(TileEntityLargeSign tileEntity) {
 		tileEntity.writeToNBT(this.mainNBTTC=new NBTTagCompound());
-		
+	}
+
+	public BlockPos getBlockPos() {
+		return blockPos;
 	}
 
 	public String[] geTheString() {
 		return this.theString;
-	}
-
-	public int getItemID() {
-		return itemID;
-	}
-
-	public int getItemMetadata() {
-		return itemMetadata;
 	}
 
 	public int getModeNumber() {
@@ -67,22 +56,6 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 		return theColor;
 	}
 
-	public int getXCoordinate() {
-		return this.xCoordinate;
-	}
-
-	public int getYCoordinate() {
-		return this.yCoordinate;
-	}
-
-	public int getZCoordinate() {
-		return this.zCoordinate;
-	}
-
-	public int getSide() {
-		return side;
-	}
-
 	public ItemStack getItemStack() {
 		return itemStack;
 	}
@@ -93,14 +66,6 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 
 	public void setHasShadow(boolean hasShadow) {
 		this.hasShadow = hasShadow;
-	}
-
-	public void setItemID(int itemID) {
-		this.itemID = itemID;
-	}
-
-	public void setItemMetadata(int itemMetadata) {
-		this.itemMetadata = itemMetadata;
 	}
 
 	public void setModeNumber(int modeNumber) {
@@ -119,13 +84,9 @@ public class CPacketUpdateLargeSign extends ClientPacket {
 	@Override
 	public void readPacketData(PacketBuffer buffer) throws IOException {
 		this.mainNBTTC = buffer.readNBTTagCompoundFromBuffer();
-		this.xCoordinate = this.mainNBTTC.getInteger("x");
-		this.yCoordinate = this.mainNBTTC.getInteger("y");
-		this.zCoordinate = this.mainNBTTC.getInteger("z");
-		this.side=this.mainNBTTC.getInteger("side");
+		this.blockPos = new BlockPos(this.mainNBTTC.getInteger("x"),
+				this.mainNBTTC.getInteger("y"), this.mainNBTTC.getInteger("z"));
 		this.setModeNumber(this.mainNBTTC.getInteger("modeNumber"));
-		this.setItemID(mainNBTTC.getInteger("itemID"));
-		this.setItemMetadata(mainNBTTC.getInteger("itemMetadata"));
 		this.setTheColor(this.mainNBTTC.getInteger("largeSignTextColor"));
 		this.setHasShadow(this.mainNBTTC.getBoolean("hasShadow"));
 		this.theString[0] = this.mainNBTTC.getString("largeSignText");

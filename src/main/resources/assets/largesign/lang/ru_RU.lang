@@ -1,10 +1,10 @@
-﻿itemGroup.tab_modRoriPantsu=RoriPantsu's Мод
-tile.Block_LargeSign_oak.name=Большая Таблица(Дуб)
-tile.Block_LargeSign_spruce.name=Большая Таблица(Ель)
-tile.Block_LargeSign_birch.name=Большая Таблица(Береза)
-tile.Block_LargeSign_jungle.name=Большая Таблица(Тропики)
-tile.Block_LargeSign_acacia.name=Большая Таблица(акация)
-tile.Block_LargeSign_dark_oak.name=Большая Таблица(Темный дуб)
+itemGroup.tab_LargeSign=Большая Таблица
+item.Item_LargeSign_Oak.name=Большая Таблица(Дуб)
+item.Item_LargeSign_Spruce.name=Большая Таблица(Ель)
+item.Item_LargeSign_Birch.name=Большая Таблица(Береза)
+item.Item_LargeSign_Jungle.name=Большая Таблица(Тропики)
+item.Item_LargeSign_Acacia.name=Большая Таблица(акация)
+item.Item_LargeSign_Dark_Oak.name=Большая Таблица(Темный дуб)
 gui.CustomGuiColorSwitcher.title=Палитра Цветов
 gui.CustomGuiIconList.prev=Предыдущая
 gui.CustomGuiIconList.next=Следующая

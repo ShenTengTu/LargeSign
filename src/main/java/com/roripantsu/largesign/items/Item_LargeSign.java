@@ -3,14 +3,15 @@ package com.roripantsu.largesign.items;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
@@ -19,21 +20,23 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import com.roripantsu.common.network.PacketPipeline;
+import com.roripantsu.largesign.Mod_LargeSign;
 import com.roripantsu.largesign.blocks.Block_LargeSign;
+import com.roripantsu.largesign.manager.ModBlocks;
+import com.roripantsu.largesign.manager.ModCreativeTabs;
+import com.roripantsu.largesign.manager.ModItemMeshDefinition;
 import com.roripantsu.largesign.manager.NameManager;
 import com.roripantsu.largesign.packet.SPacketLargeSignEditorOpen;
 import com.roripantsu.largesign.tileentity.TileEntityLargeSign;
 
-public class ItemBlock_LargeSign extends ItemBlock {
+public class Item_LargeSign extends Item {
 	
-	private final Block theBlock;
-	
-	public ItemBlock_LargeSign(Block block) {
-		super(block);
-		this.theBlock=block;
-		this.maxStackSize = 8;
-		this.setUnlocalizedName(NameManager.Unlocalized.ItemLargeSign);
+	public Item_LargeSign() {
+		this.setMaxStackSize(8);
+		this.setCreativeTab(ModCreativeTabs.tab_LargeSign);
+		//for Sub Block or Item
+		this.setMaxDamage(0);
+		this.setHasSubtypes(true);
 	}
 	
 	//for Sub Block or Item
@@ -54,16 +57,23 @@ public class ItemBlock_LargeSign extends ItemBlock {
 	    }
 	}
 	
+	//for Sub Block or Item
+	@Override
+	 @SideOnly(Side.CLIENT)
+    public ModelResourceLocation getModel(ItemStack stack, EntityPlayer player, int useRemaining)
+    {
+		return new ModItemMeshDefinition().getModelLocation(stack);
+    }
+    
+	
 	@Override
 	public boolean onItemUse(ItemStack itemStack, EntityPlayer entityPlayer,
 			World world, BlockPos pos, EnumFacing side, float hitX,
 			float hitY, float hitZ) {
 		
-		IBlockState blockState = world.getBlockState(pos);
-		
 		if (side == EnumFacing.DOWN || side ==EnumFacing.UP)
 			return false;
-		else if (!blockState.getBlock().getMaterial().isSolid())
+		else if (!world.getBlockState(pos).getBlock().getMaterial().isSolid())
 
 			return false;
 		else {
@@ -72,51 +82,41 @@ public class ItemBlock_LargeSign extends ItemBlock {
 
 			if (!entityPlayer.func_175151_a(pos, side, itemStack))
 				return false;
-			else if (!this.theBlock.canPlaceBlockAt(world, pos))
+			else if (!ModBlocks.LargeSign.canPlaceBlockAt(world, pos))
 				return false;
 			else if (world.isRemote)
 				return true;
 			else {
 				
-				blockState = this.theBlock.getDefaultState();
+				IBlockState blockState = ModBlocks.LargeSign.getDefaultState();
 				world.setBlockState(pos, blockState.withProperty(Block_LargeSign.PROP_FACING, side));
 				world.setBlockState(pos, blockState.withProperty(Block_LargeSign.PROP_SUB_TYPE, Block_LargeSign.ESubType.getType(itemStack.getItemDamage())));
 				
 	            --itemStack.stackSize;
 
-				TileEntityLargeSign tileentitylargesign = (TileEntityLargeSign) world
-						.getTileEntity(pos);
-
-				if (tileentitylargesign != null){			        
-					tileentitylargesign.setSide(side);
-					this.openLargeSignEditor(entityPlayer,tileentitylargesign);
+				TileEntity tileentity = world.getTileEntity(pos);
+				
+				if (tileentity instanceof TileEntityLargeSign && !ItemBlock.setTileEntityNBT(world, pos, itemStack)){			        
+					
+					((TileEntityLargeSign)tileentity).setEntityPlayer(entityPlayer);
+					
+					SPacketLargeSignEditorOpen thePacket = new SPacketLargeSignEditorOpen((TileEntityLargeSign)tileentity);
+						
+						try {
+							List<FMLProxyPacket> list = new LinkedList<FMLProxyPacket>();
+							Mod_LargeSign.packetPipeline.encode(thePacket, list);
+							FMLProxyPacket pkt = (FMLProxyPacket) list.get(0);
+							Mod_LargeSign.packetPipeline.sendToPlayer(pkt,(EntityPlayerMP)entityPlayer);
+						} catch (Exception exception) {
+							exception.printStackTrace();
+						}
+					
 				}
-
+					
 				return true;
 			}
 		}
 	}
 
-	private void openLargeSignEditor(EntityPlayer entityPlayer,
-			TileEntityLargeSign tileEntity) {
-		if (entityPlayer instanceof EntityPlayerMP) {
-			tileEntity.setEntityPlayer(entityPlayer);
-			
-			SPacketLargeSignEditorOpen thePacket = 
-					new SPacketLargeSignEditorOpen(tileEntity);
-
-			try {
-				List<Object> list = new LinkedList<Object>();
-				PacketPipeline.instance().encode(thePacket, list);
-				FMLProxyPacket pkt = (FMLProxyPacket) list.get(0);
-				PacketPipeline.instance().sendTo(pkt,
-						(EntityPlayerMP) entityPlayer);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-		}
-
-	}
 
 }
